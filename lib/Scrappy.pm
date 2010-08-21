@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.52';
+  $Scrappy::VERSION = '0.521';
 }
 use WWW::Mechanize::Pluggable;
 use File::ShareDir ':ALL';
@@ -307,7 +307,7 @@ sub list {
 
 sub fst {
     my @array = list @_;
-    return @array;
+    return shift @array;
 }
 
 
@@ -326,7 +326,7 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.52
+version 0.521
 
 =head1 SYNOPSIS
 
