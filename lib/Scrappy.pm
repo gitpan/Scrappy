@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.5';
+  $Scrappy::VERSION = '0.51';
 }
 use WWW::Mechanize::Pluggable;
 use File::ShareDir ':ALL';
@@ -44,6 +44,7 @@ BEGIN {
         www
         store
         download
+        list
     );
     %EXPORT_TAGS = ( syntax => [ @EXPORT_OK ] );
 }
@@ -86,7 +87,10 @@ sub var {
             my @keys = split /\//, $key;
             my $var  = self->{Scrappy}->{stash};
             for (my $i = 0; $i < @keys; $i++) {
-                $var->{$keys[$i]} = (($i+1) == @keys) ? $value : {};
+                $var->{$keys[$i]} = $value
+                    if ($i+1) == @keys;
+                $var->{$keys[$i]} = {}
+                    if ($i+1) != @keys && ! defined $var->{$keys[$i]};
                 $var = $var->{$keys[$i]};
             }
             return $value;
@@ -291,6 +295,13 @@ sub download {
     return store(@_);
 }
 
+
+sub list {
+    die 'The argument passed to the list method must be an arrayref'
+        if ref($_[0]) ne "ARRAY";
+    return @{$_[0]};
+}
+
 1;
 __END__
 =pod
@@ -301,7 +312,36 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.5
+version 0.51
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/perl
+    use Scrappy qw/:syntax/;
+    
+    init;
+    user_agent random_ua;
+    get 'http://google.com';
+    
+    form fields => {
+        q => "what is perl"
+    };
+    
+    var 'results' =>
+        grab '#search li h3 a', { name => 'TEXT', link => '@href' };
+
+=head1 DESCRIPTION
+
+Scrappy is an easy (and hopefully fun) way of scraping, spidering, and/or
+harvesting information from web pages. Internally Scrappy uses the awesome
+Web::Scraper and WWW::Mechanize modules so as such Scrappy imports its
+awesomeness. Scrappy is inspired by the fun and easy-to-use Dancer API. Beyond
+being a pretty API for WWW::Mechanize::Plugin::Web::Scraper, Scrappy also has
+the persistant cookie handling, session handling, and more.
+
+Scrappy == 'Scraper Happy' or 'Happy Scraper'; If you like you may call it
+Scrapy although Python has a web scraping framework by that name and we don't
+plagiarize Python code here.
 
 =head1 METHODS
 
@@ -528,30 +568,14 @@ follow the link, store the contents in the file and return to the previous page.
 
 The download method is an alias to the store method.
 
-=head2 SYNOPSIS
+=head2 list
 
-    #!/usr/bin/perl
-    use Scrappy qw/:syntax/;
-    
-    init;
-    user_agent random_ua;
-    get 'http://google.com';
-    
-    form fields => {
-        q => "what is perl"
-    };
-    
-    var 'results' =>
-        grab '#search li h3 a', { name => 'TEXT', link => '@href' };
+The list method is an aesthetically pleasing method of dereferencing an
+arrayref. This method dies if the argument is not an arrayref.
 
-=head3 DESCRIPTION
-
-Scrappy is an easy (and hopefully fun) way of scraping, spidering, and/or
-harvesting information from web pages. Internally Scrappy uses the awesome
-Web::Scraper and WWW::Mechanize modules so as such Scrappy imports its
-awesomeness. Scrappy is inspired by the fun and easy-to-use Dancer api. Beyond
-being a pretty api for WWW::Mechanize::Plugin::Web::Scraper, Scrappy also has
-the following features: automatic cookie session storage with resume.
+    foreach my $item (list var->{items}) {
+        ...
+    }
 
 =head1 AUTHOR
 

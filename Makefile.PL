@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     'Test::More' => '0',
     'WWW::Mechanize::Plugin::Web::Scraper' => '0'
   },
-  'VERSION' => '0.5',
+  'VERSION' => '0.51',
   'test' => {
     'TESTS' => 't/*.t'
   }

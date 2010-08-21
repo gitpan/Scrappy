@@ -3,6 +3,7 @@ MANIFEST
 META.yml
 Makefile.PL
 README
+TODO
 dist.ini
 eg/cpan.test.pl
 lib/Scrappy.pm
