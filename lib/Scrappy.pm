@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.51';
+  $Scrappy::VERSION = '0.52';
 }
 use WWW::Mechanize::Pluggable;
 use File::ShareDir ':ALL';
@@ -45,6 +45,8 @@ BEGIN {
         store
         download
         list
+        fst
+        lst
     );
     %EXPORT_TAGS = ( syntax => [ @EXPORT_OK ] );
 }
@@ -302,6 +304,18 @@ sub list {
     return @{$_[0]};
 }
 
+
+sub fst {
+    my @array = list @_;
+    return @array;
+}
+
+
+sub lst {
+    my @array = list @_;
+    return pop @array;
+}
+
 1;
 __END__
 =pod
@@ -312,7 +326,7 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.51
+version 0.52
 
 =head1 SYNOPSIS
 
@@ -576,6 +590,20 @@ arrayref. This method dies if the argument is not an arrayref.
     foreach my $item (list var->{items}) {
         ...
     }
+
+=head2 fst
+
+The fst (first) method shifts the passed in arrayref returning the first element
+in the array shortening it by one.
+
+    var foo => fst grab '.class', { name => 'TEXT' };
+
+=head2 lst
+
+The lst (last) method pops the passed in arrayref returning the last element
+in the array shortening it by one.
+
+    var foo => lst grab '.class', { name => 'TEXT' };
 
 =head1 AUTHOR
 
