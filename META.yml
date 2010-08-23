@@ -19,4 +19,5 @@ requires:
   HTML::TreeBuilder: 0
   Test::More: 0
   WWW::Mechanize::Plugin::Web::Scraper: 0
-version: 0.521
+  YAML::Syck: 0
+version: 0.55

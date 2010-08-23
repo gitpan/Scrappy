@@ -5,13 +5,16 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.521';
+  $Scrappy::VERSION = '0.55';
 }
+use FindBin;
 use WWW::Mechanize::Pluggable;
 use File::ShareDir ':ALL';
 use File::Slurp;
+use YAML::Syck;
 
 our $class_Instance = undef;
+    $YAML::Syck::ImplicitTyping = 1;
 
 BEGIN {
     use Exporter();
@@ -47,6 +50,8 @@ BEGIN {
         list
         fst
         lst
+        session
+        cookies
     );
     %EXPORT_TAGS = ( syntax => [ @EXPORT_OK ] );
 }
@@ -176,21 +181,28 @@ sub form {
 
 
 sub get {
-    return self->get(@_);
+    my $request = self->get(@_);
+    self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+    return $request;
 }
 
 
 sub post {
     my ($url, $params) = @_;
     if ($url && ref($params) eq "HASH") {
+        my $request =
         self->post(
             $url,
             'Content-Type' => 'application/x-www-form-urlencoded',
             'Content'      => $params
         );
+        self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+        return $request;
     }
     else {
-        return self->post(@_);
+        my $request = self->post(@_);
+        self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+        return $request;
     }
 }
 
@@ -269,8 +281,10 @@ sub html {
 
 
 sub data {
-    unless ($_[1]) {
-        self->update_html($_[0]);
+    if ($_[0]) {
+        unless ($_[1]) {
+            self->update_html($_[0]);
+        }
     }
     return self->content(@_);
 }
@@ -316,6 +330,97 @@ sub lst {
     return pop @array;
 }
 
+
+sub session {
+    if (@_ == 2) {
+        my ($key, $value) = @_;
+        if ($key eq "_file" && defined $value) {
+            # load session file
+            die "Session file `$value` does not exist or is not read/writable"
+                unless -e $value && -w $value && -r $value;
+            var 'session' => LoadFile($value);
+            # attempt to reload cookies from previous session
+            if (var->{'session'}) {
+                if (keys %{var->{'session'}->{'cookies'}}) {
+                    if (ref(self->{Mech}->{cookie_jar}) eq "HTTP::Cookies") {
+                        foreach my $domain (keys %{var->{'session'}->{'cookies'}}) {
+                            foreach my $key (keys %{var->{'session'}->{'cookies'}->{$domain}}) {
+                                self->{Mech}->{cookie_jar}->set_cookie(
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{version},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{key},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{val},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{path},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{domain},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{port},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{path_spec},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{secure},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{maxage},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{discard},
+                                    var->{'session'}->{'cookies'}->{$domain}->{$key}->{hash}
+                                );
+                            }
+                        }
+                    }
+                    
+                }
+            }
+            else {
+                var 'session' => {};
+            }
+            var 'config'  => $value;
+        }
+        if ($key && $value) {
+            die "Please define your session file using keyword _file before creating " .
+                "session variables" unless defined var->{config};
+            var->{'session'}->{$key} = $value unless $key eq '_file';
+            DumpFile(var->{config}, var->{'session'}) unless $key eq '_file';
+        }
+        return var->{'session'};
+    }
+    else {
+        return var->{'session'};
+    }
+}
+
+
+sub cookies {
+    self->{Mech}->{cookie_jar} = undef if $_[0] eq '_undef';
+    return self->{Mech}->{cookie_jar};
+}
+
+# This method is called automatically whenever cookies are saved.
+sub _cookies_to_session {
+    my (
+        $version,
+        $key,
+        $val,
+        $path,
+        $domain,
+        $port,
+        $path_spec,
+        $secure,
+        $expires,
+        $discard,
+        $hash
+        ) = @_;
+    session 'cookies' => {}
+        unless defined session->{'cookies'};
+    session->{'cookies'}->{$domain}->{$key} = {
+        version     => $version,
+        key         => $key,
+        val         => $val,
+        path        => $path,
+        domain      => $domain,
+        port        => $port,
+        path_spec   => $path_spec,
+        secure      => $secure,
+        expires     => $expires,
+        discard     => $discard,
+        hash        => $hash
+    };
+    DumpFile(var->{config}, var->{'session'});
+}
+
 1;
 __END__
 =pod
@@ -326,23 +431,24 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.521
+version 0.55
 
 =head1 SYNOPSIS
 
     #!/usr/bin/perl
     use Scrappy qw/:syntax/;
-    
+        
     init;
     user_agent random_ua;
-    get 'http://google.com';
     
-    form fields => {
-        q => "what is perl"
-    };
+    get 'http://search.cpan.org/recent';
     
-    var 'results' =>
-        grab '#search li h3 a', { name => 'TEXT', link => '@href' };
+    if (loaded) {
+        var date    => grab '.datecell b';
+        var modules => grab '#cpansearch li a', { name => 'TEXT', link => '@href' };
+    }
+    
+    print $_->{name}, "\n" for list var->{modules};
 
 =head1 DESCRIPTION
 
@@ -395,10 +501,11 @@ This method sets a stash (shared) variable or returns the entire stash object.
     my @array = (1..20);
     var integers => @array;
     
+    
     # stash variable nesting
+    # ** EXPERIMENTAL - Not Recommended **
     var 'user/profile/name' => 'Mr. Foobar';
     print var->{user}->{profile}->{name};
-    # Mr. Foobar
 
 =head2 random_ua
 
@@ -604,6 +711,42 @@ The lst (last) method pops the passed in arrayref returning the last element
 in the array shortening it by one.
 
     var foo => lst grab '.class', { name => 'TEXT' };
+
+=head2 session
+
+The session method provides a means for storing important data across executions.
+There is one special session variable `_file` whose name is used to define the
+directory where session files will be stored. This variable is automatically set
+upon initialization to ./$scriptname_session.yml under the current working
+directory, please make sure it exists and is writable. Yes, as I am sure you've
+deduced, the session file will be stored as YAML code. Cookies are automatically
+stored and retrieved in your session file automatically.
+
+    init;
+    session _file => '/tmp/foo_session.yml';
+    session foo => 'bar';
+    my $var = session->{foo};
+    # $var == 'bar'
+
+Please make sure to create a valid session file, use the following as an example
+and note that there is a newline on the alst line of the file:
+
+    # scrappy session file
+    ---
+
+=head2 cookies
+
+The cookies method is a shortcut to the automatically generated WWW:Mechanize
+cookie handler. This method returns an HTTP::Cookie object. Setting this as
+undefined will prevent cookies from being stored and subsequently read.
+
+    init;
+    get $requested_url;
+    my $cookies = cookies;
+    
+    # prevent cookie storage
+    init;
+    cookies _undef;
 
 =head1 AUTHOR
 
