@@ -19,3 +19,4 @@ t/002_scrappy_init.t
 t/003_scrappy_user_agent.t
 t/004_scrappy_stash_object.t
 t/005_user_agent_random.t
+t/006_zoom_usage.t
