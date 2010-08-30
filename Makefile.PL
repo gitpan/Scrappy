@@ -30,7 +30,7 @@ my %WriteMakefileArgs = (
     'WWW::Mechanize::Plugin::Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.56',
+  'VERSION' => '0.58',
   'test' => {
     'TESTS' => 't/*.t'
   }

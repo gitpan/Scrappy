@@ -6,6 +6,7 @@ README
 TODO
 dist.ini
 eg/cpan.test.pl
+eg/proxy.test.pl
 lib/Scrappy.pm
 scrappy.kpf
 share/support/chrome.txt

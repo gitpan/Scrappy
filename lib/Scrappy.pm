@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.56';
+  $Scrappy::VERSION = '0.58';
 }
 use FindBin;
 use WWW::Mechanize::Pluggable;
@@ -54,6 +54,7 @@ BEGIN {
         cookies
         config
         zoom
+        proxy
     );
     %EXPORT_TAGS = ( syntax => [ @EXPORT_OK ] );
 }
@@ -465,22 +466,31 @@ sub _cookies_to_session {
         $discard,
         $hash
         ) = @_;
-    session 'cookies' => {}
-        unless defined session->{'cookies'};
-    session->{'cookies'}->{$domain}->{$key} = {
-        version     => $version,
-        key         => $key,
-        val         => $val,
-        path        => $path,
-        domain      => $domain,
-        port        => $port,
-        path_spec   => $path_spec,
-        secure      => $secure,
-        expires     => $expires,
-        discard     => $discard,
-        hash        => $hash
-    };
-    DumpFile(var->{config}, var->{'session'});
+    if (var->{config}) {
+        session 'cookies' => {}
+            unless defined session->{'cookies'};
+        session->{'cookies'}->{$domain}->{$key} = {
+            version     => $version,
+            key         => $key,
+            val         => $val,
+            path        => $path,
+            domain      => $domain,
+            port        => $port,
+            path_spec   => $path_spec,
+            secure      => $secure,
+            expires     => $expires,
+            discard     => $discard,
+            hash        => $hash
+        };
+        DumpFile(var->{config}, var->{'session'});
+    }
+}
+
+
+sub proxy {
+    my $proxy    = pop @_;
+    my @protocol = @_;
+    return self->proxy([@protocol], $proxy);
 }
 
 1;
@@ -493,7 +503,7 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.56
+version 0.58
 
 =head1 SYNOPSIS
 
@@ -857,6 +867,37 @@ subsequently read.
     # prevent cookie storage
     init;
     cookies _undef;
+
+=head2 proxy
+
+The proxy method is a shortcut to the WWW::Mechanize proxy function. This method
+set the proxy for the next request to be tunneled through. Setting this as
+undefined using the _undef keyword will reset the scraper application instance
+so that all subsequent requests will not use a proxy.
+
+    init;
+    proxy 'http', 'http://proxy.example.com:8000/';
+    get $requested_url;
+    
+    init;
+    proxy 'http', 'ftp', 'http://proxy.example.com:8000/';
+    get $requested_url;
+    
+    # best practice
+    
+    use Tiny::Try;
+    
+    init;
+    proxy 'http', 'ftp', 'http://proxy.example.com:8000/';
+    
+    try {
+        get $requested_url
+    };
+
+Note! When using a proxy to perform requests, be aware that if they fail your
+program will die unless you wrap yoru code in an eval statement or use a try/catch
+module. In the example above we use Tiny::Try to trap an errors that might occur
+when using a proxy.
 
 =head1 AUTHOR
 
