@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.58';
+  $Scrappy::VERSION = '0.59';
 }
 use FindBin;
 use WWW::Mechanize::Pluggable;
@@ -13,7 +13,7 @@ use File::ShareDir ':ALL';
 use File::Slurp;
 use YAML::Syck;
 
-our $class_Instance = undef;
+our $class_Instance             = undef;
     $YAML::Syck::ImplicitTyping = 1;
 
 BEGIN {
@@ -55,6 +55,7 @@ BEGIN {
         config
         zoom
         proxy
+        pause
     );
     %EXPORT_TAGS = ( syntax => [ @EXPORT_OK ] );
 }
@@ -62,11 +63,13 @@ BEGIN {
 
 
 sub init {
-    $class_Instance = WWW::Mechanize::Pluggable->new();
+    $class_Instance = WWW::Mechanize::Pluggable->new(@_);
     die 'Could not create a scraper application instance, please make sure you ' .
         'have install Scrappy and its prerequesites properly.'
         unless defined $class_Instance;
-    $class_Instance->{Scrappy} = { stash => {} };
+    
+    $class_Instance->{Scrappy}       = { stash => {} };
+    $class_Instance->{Mech}->{pause} = 0;
     return $class_Instance;
 }
 
@@ -179,13 +182,16 @@ sub random_ua {
 
 
 sub form {
-    return self->submit_form(@_);
+    my $response = self->submit_form(@_);
+    sleep pause();
+    return $response;
 }
 
 
 sub get {
     my $request = self->get(@_);
     self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+    sleep pause();
     return $request;
 }
 
@@ -200,11 +206,13 @@ sub post {
             'Content'      => $params
         );
         self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+        sleep pause();
         return $request;
     }
     else {
         my $request = self->post(@_);
         self->{Mech}->{cookie_jar}->scan(\&_cookies_to_session);
+        sleep pause();
         return $request;
     }
 }
@@ -275,12 +283,16 @@ sub status {
 
 
 sub reload {
-    return self->reload;
+    my $response = self->reload;
+    sleep pause();
+    return $response;
 }
 
 
 sub back {
-    return self->back;
+    my $response = self->back;
+    sleep pause();
+    return $response;
 }
 
 
@@ -493,6 +505,31 @@ sub proxy {
     return self->proxy([@protocol], $proxy);
 }
 
+
+sub pause {
+    if ($_[0]) {
+        if ($_[1]) {
+            my @range = (($_[0] < $_[1] ? $_[0] : 0)..$_[1]);
+            self->{Mech}->{pause_range} = [$_[0], $_[1]];
+            self->{Mech}->{pause} = $range[rand(@range)];
+        }
+        else {
+            self->{Mech}->{pause} = $_[0];
+        }
+    }
+    else {
+        my $interval = self->{Mech}->{pause};
+        
+        # select the next random pause value from the range
+        if (defined self->{Mech}->{pause_range}) {
+            my @range = list self->{Mech}->{pause_range};
+            pause(@range) if @range == 2;
+        }
+        
+        return $interval;
+    }
+}
+
 1;
 __END__
 =pod
@@ -503,7 +540,7 @@ Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
 
 =head1 VERSION
 
-version 0.58
+version 0.59
 
 =head1 SYNOPSIS
 
@@ -898,6 +935,38 @@ Note! When using a proxy to perform requests, be aware that if they fail your
 program will die unless you wrap yoru code in an eval statement or use a try/catch
 module. In the example above we use Tiny::Try to trap an errors that might occur
 when using a proxy.
+
+=head2 pause
+
+The pause method is an adaptation of the WWW::Mechanize::Sleep module. This method
+sets breaks between your requests in an attempt to simulate human interaction.
+
+    init;
+    pause 20;
+    
+    get $request_1;
+    get $request_2;
+    get $request_3;
+
+The will be a break between each request made, get, post, request, etc., You can
+also specify a range to have the pause method select from at random...
+
+    init;
+    pause 5,20;
+    
+    get $request_1;
+    get $request_2;
+    
+    # reset/turn it off
+    pause 0;
+    
+    print "I slept for ", (pause), " seconds";
+
+Note! The download method is exempt from any automatic pausing, to pause after a
+download one could obviously...
+
+    download $requested_url, '/tmp';
+    sleep pause();
 
 =head1 AUTHOR
 

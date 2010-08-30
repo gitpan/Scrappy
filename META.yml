@@ -20,4 +20,4 @@ requires:
   Test::More: 0
   WWW::Mechanize::Plugin::Web::Scraper: 0
   YAML::Syck: 0
-version: 0.58
+version: 0.59
