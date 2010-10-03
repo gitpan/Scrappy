@@ -7,8 +7,10 @@ TODO
 dist.ini
 eg/cpan.test.pl
 eg/proxy.test.pl
+eg/scrappy_doo.pl
 lib/Scrappy.pm
-scrappy.kpf
+lib/Scrappy/Doo.pm
+lib/Scrappy/Examples.pod
 share/support/chrome.txt
 share/support/explorer.txt
 share/support/firefox.txt

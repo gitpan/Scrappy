@@ -1,10 +1,8 @@
-# Scrappy - Simple Stupid Spider base on Web::Scraper inspired by Dancer
-
 #!/usr/bin/perl
+# Scrappy - This aint your father's web spider :}
 
 use Scrappy qw/:syntax/;
 
-init;
 user_agent random_ua;
 session _file => './session.yml';
 
@@ -17,3 +15,27 @@ if (loaded) {
 
 print var->{date}, "\n" ;
 print $_->{name} , "\n" for list var->{modules};
+
+
+--------------------------------------------------------------------
+
+#!/usr/bin/perl
+# Scrappy - All Powerful Web Harvester, Spider, Scraper fully automated
+
+use Scrappy qw/:syntax/;
+    
+user_agent random_ua;
+var url => 'http://search.cpan.org/author/';
+
+crawl var->{url}, {
+    'a' => sub {
+        my $href = shift->href;
+        queue $href if
+        $href =~ var->{url} ||
+        $href =~ /http\:\/\/search\.cpan\.org\/\~/;
+    },
+    '/html/body/div[2]/table/tr[2]/td[2]/a' => sub {
+        print page(), '=', shift->href, "\n" if
+        page =~ /http\:\/\/search\.cpan\.org\/\~/;
+    }
+};
