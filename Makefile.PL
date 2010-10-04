@@ -11,7 +11,7 @@ install_share "share";
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'All Powerful Web Harvester, Spider, Scraper fully automated',
+  'ABSTRACT' => 'All Powerful Web Harvester, Spider, Scraper at your service',
   'AUTHOR' => 'Al Newkirk <awncorp@cpan.org>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     'WWW::Mechanize::Plugin::Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.591',
+  'VERSION' => '0.592',
   'test' => {
     'TESTS' => 't/*.t'
   }

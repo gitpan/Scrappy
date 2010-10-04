@@ -1,11 +1,11 @@
-# ABSTRACT: All Powerful Web Harvester, Spider, Scraper fully automated
+# ABSTRACT: All Powerful Web Harvester, Spider, Scraper at your service
 
 use strict;
 use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.591';
+  $Scrappy::VERSION = '0.592';
 }
 use FindBin;
 use WWW::Mechanize::Pluggable;
@@ -752,16 +752,17 @@ sub denied {
 }
 
 init;
+
 __END__
 =pod
 
 =head1 NAME
 
-Scrappy - All Powerful Web Harvester, Spider, Scraper fully automated
+Scrappy - All Powerful Web Harvester, Spider, Scraper at your service
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 SYNOPSIS
 

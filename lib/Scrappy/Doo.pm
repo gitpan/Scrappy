@@ -1,20 +1,21 @@
-# ABSTRACT: All Powerful Web Harvester, Spider, Scraper
+# ABSTRACT: All Powerful Web Harvester, Spider, Scraper at your service
 package Scrappy::Doo;
 BEGIN {
-  $Scrappy::Doo::VERSION = '0.591';
+  $Scrappy::Doo::VERSION = '0.592';
 }
 use base 'Scrappy';
 1;
+
 __END__
 =pod
 
 =head1 NAME
 
-Scrappy::Doo - All Powerful Web Harvester, Spider, Scraper
+Scrappy::Doo - All Powerful Web Harvester, Spider, Scraper at your service
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 AUTHOR
 

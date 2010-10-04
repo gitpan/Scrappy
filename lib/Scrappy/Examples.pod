@@ -11,7 +11,7 @@ Scrappy::Examples - How Do I Command The All Powerful Web Scraper Scrappy?
 
 =head1 VERSION
 
-version 0.591
+version 0.592
 
 =head1 WHAT IS SCRAPPY
 
