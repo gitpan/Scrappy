@@ -1,25 +1,24 @@
-# ABSTRACT: All Powerful Web Harvester, Spider, Scraper at your service
+# ABSTRACT: All Powerful Web Harvester, Spider, Scraper
 package Scrappy::Doo;
 BEGIN {
-  $Scrappy::Doo::VERSION = '0.592';
+  $Scrappy::Doo::VERSION = '0.593';
 }
 use base 'Scrappy';
 1;
-
 __END__
 =pod
 
 =head1 NAME
 
-Scrappy::Doo - All Powerful Web Harvester, Spider, Scraper at your service
+Scrappy::Doo - All Powerful Web Harvester, Spider, Scraper
 
 =head1 VERSION
 
-version 0.592
+version 0.593
 
 =head1 AUTHOR
 
-  Al Newkirk <awncorp@cpan.org>
+Al Newkirk <awncorp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 

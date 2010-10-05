@@ -7,11 +7,11 @@ use warnings;
 use ExtUtils::MakeMaker 6.31;
 
 use File::ShareDir::Install;
-install_share "share";
+install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'All Powerful Web Harvester, Spider, Scraper at your service',
+  'ABSTRACT' => 'All Powerful Web Harvester, Spider, Scraper fully automated',
   'AUTHOR' => 'Al Newkirk <awncorp@cpan.org>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
@@ -32,7 +32,7 @@ my %WriteMakefileArgs = (
     'WWW::Mechanize::Plugin::Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.592',
+  'VERSION' => '0.593',
   'test' => {
     'TESTS' => 't/*.t'
   }
@@ -41,10 +41,10 @@ my %WriteMakefileArgs = (
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM}; 
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
   for my $mod ( keys %$br ) {
     if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod}; 
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
     }
     else {
       $pp->{$mod} = $br->{$mod};

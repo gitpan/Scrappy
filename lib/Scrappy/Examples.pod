@@ -11,7 +11,7 @@ Scrappy::Examples - How Do I Command The All Powerful Web Scraper Scrappy?
 
 =head1 VERSION
 
-version 0.592
+version 0.593
 
 =head1 WHAT IS SCRAPPY
 
@@ -74,7 +74,7 @@ your local congressman.
 
 =head1 AUTHOR
 
-  Al Newkirk <awncorp@cpan.org>
+Al Newkirk <awncorp@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
