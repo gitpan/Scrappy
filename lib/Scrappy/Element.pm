@@ -1,16 +1,24 @@
-# ABSTRACT: A Magical Scrappy Namespace Where Wild Things Are
-package Scrappy::Doo;
+# ABSTRACT: Selected Element Object Instance
+
+use strict;
+use warnings;
+
+package Scrappy::Element;
 BEGIN {
-  $Scrappy::Doo::VERSION = '0.6';
+  $Scrappy::Element::VERSION = '0.6';
 }
-use Scrappy qw/:syntax/;
+
+sub new {
+    bless {}, shift;
+}
+
 1;
 __END__
 =pod
 
 =head1 NAME
 
-Scrappy::Doo - A Magical Scrappy Namespace Where Wild Things Are
+Scrappy::Element - Selected Element Object Instance
 
 =head1 VERSION
 

@@ -7,7 +7,7 @@ use warnings;
 use ExtUtils::MakeMaker 6.31;
 
 use File::ShareDir::Install;
-install_share dist => "share";
+install_share "share";
 
 
 my %WriteMakefileArgs = (
@@ -29,10 +29,12 @@ my %WriteMakefileArgs = (
     'HTML::TreeBuilder' => '0',
     'Test::More' => '0',
     'Try::Tiny' => '0',
-    'WWW::Mechanize::Plugin::Web::Scraper' => '0',
+    'URI' => '0',
+    'WWW::Mechanize' => '0',
+    'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.593',
+  'VERSION' => '0.6',
   'test' => {
     'TESTS' => 't/*.t'
   }
@@ -41,10 +43,10 @@ my %WriteMakefileArgs = (
 
 unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
   my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
-  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  my $pp = $WriteMakefileArgs{PREREQ_PM}; 
   for my $mod ( keys %$br ) {
     if ( exists $pp->{$mod} ) {
-      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod}; 
     }
     else {
       $pp->{$mod} = $br->{$mod};

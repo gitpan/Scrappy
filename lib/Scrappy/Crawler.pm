@@ -1,16 +1,24 @@
-# ABSTRACT: A Magical Scrappy Namespace Where Wild Things Are
-package Scrappy::Doo;
+# ABSTRACT: Fully Automated Web Crawler
+
+use strict;
+use warnings;
+
+package Scrappy::Crawler;
 BEGIN {
-  $Scrappy::Doo::VERSION = '0.6';
+  $Scrappy::Crawler::VERSION = '0.6';
 }
-use Scrappy qw/:syntax/;
+
+sub new {
+    bless {}, shift;
+}
+
 1;
 __END__
 =pod
 
 =head1 NAME
 
-Scrappy::Doo - A Magical Scrappy Namespace Where Wild Things Are
+Scrappy::Crawler - Fully Automated Web Crawler
 
 =head1 VERSION
 

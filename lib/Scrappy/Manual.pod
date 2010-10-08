@@ -1,0 +1,88 @@
+# ABSTRACT: How Do I Command The All Powerful Web Scraper Scrappy?
+
+package Scrappy::Manual;
+
+
+__END__
+=pod
+
+=head1 NAME
+
+Scrappy::Manual - How Do I Command The All Powerful Web Scraper Scrappy?
+
+=head1 VERSION
+
+version 0.6
+
+=head1 DISCLAIMER
+
+This documentation is incomplete, obviously. For help and support find alnewkirk
+or alnewkirk|com on IRC, or find this project on GitHub. If all else fails, write
+your local congressman.
+
+=head1 WHAT IS SCRAPPY
+
+Scrappy is an easy (and hopefully fun) way of scraping, spidering, and/or
+harvesting information from web pages. Internally Scrappy uses the awesome
+Web::Scraper and WWW::Mechanize modules so as such Scrappy imports its
+awesomeness. Scrappy is inspired by the fun and easy-to-use Dancer API. Beyond
+being a pretty API for WWW::Mechanize::Plugin::Web::Scraper, Scrappy also has its
+own featuer-set which makes web scraping easier and more enjoyable.
+
+Scrappy (pronounced Scrap+Pee) == 'Scraper Happy' or 'Happy Scraper'; If you
+like you may call it Scrapy (pronounced Scrape+Pee) although Python has a web
+scraping framework by that name and this module is not a port of that one.
+
+=head1 BASIC USAGE
+
+    #!/usr/bin/perl
+    use Scrappy qw/:syntax/;
+        
+    # get page from URL
+    get 'http://search.cpan.org/recent';
+    
+    if (loaded) {
+        var modules => grab '#cpansearch li a', { name => 'TEXT', link => '@href' };
+    }
+    
+    # the list function deferences, list == @{...}
+    print $_->{name}, "\n" for list var->{modules};
+
+=head1 ADVANCED USAGE
+
+=head2 Scrape From A Website
+
+    get $website_url;
+    var foo => grab 'a.more_info', 'ALL';
+
+=head2 Scrape From A File
+
+    use URI;
+    get URI->new($filename);
+    var foo => grab 'div', 'ALL';
+
+=head2 Scrape An Entire Website
+
+    crawl $starting_url, {
+        'a' => sub { queue shift->href },
+        '/*' => sub {
+            # /* matches the root node, you can also use body, div.container, etc
+            # do something
+        }
+    };
+
+=cut
+
+=head1 AUTHOR
+
+  Al Newkirk <awncorp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by awncorp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

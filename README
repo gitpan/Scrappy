@@ -1,41 +1,12 @@
 #!/usr/bin/perl
-# Scrappy - This aint your father's web spider :}
 
-use Scrappy qw/:syntax/;
+# Scrappy - Your friendly neighborhood web crawler!
 
-user_agent random_ua;
-session _file => './session.yml';
+use Scrappy;
+our $spidy = Scrappy->new;
 
-get 'http://search.cpan.org/recent';
-
-if (loaded) {
-    var date    => grab '.datecell b';
-    var modules => grab '#cpansearch li a', { name => 'TEXT', link => '@href' };
-}
-
-print var->{date}, "\n" ;
-print $_->{name} , "\n" for list var->{modules};
-
-
---------------------------------------------------------------------
-
-#!/usr/bin/perl
-# Scrappy - All Powerful Web Harvester, Spider, Scraper fully automated
-
-use Scrappy qw/:syntax/;
-    
-user_agent random_ua;
-var url => 'http://search.cpan.org/author/';
-
-crawl var->{url}, {
-    'a' => sub {
-        my $href = shift->href;
-        queue $href if
-        $href =~ var->{url} ||
-        $href =~ /http\:\/\/search\.cpan\.org\/\~/;
-    },
-    '/html/body/div[2]/table/tr[2]/td[2]/a' => sub {
-        print page(), '=', shift->href, "\n" if
-        page =~ /http\:\/\/search\.cpan\.org\/\~/;
-    }
-};
+   $spidy->crawl('http://search.cpan.org/recent', {
+        '#cpansearch li a' => sub {
+            print shift->text, "\n";
+        }
+   });
