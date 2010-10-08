@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.6';
+  $Scrappy::VERSION = '0.61';
 }
 
 use FindBin;
@@ -773,13 +773,15 @@ sub crawl {
                 $function = $action = $actions->{$route}->{$selector};                
                 if (match $route) {
                     my $findings = grab $selector, ':all';
-                    if ("array" eq lc ref $findings) {
-                        foreach (@{$findings}) {
-                            $function->($_);
+                    if ($findings) {
+                        if ("array" eq lc ref $findings) {
+                            foreach (@{$findings}) {
+                                $function->($_);
+                            }
                         }
-                    }
-                    else {
-                        $function->($findings);
+                        else {
+                            $function->($findings);
+                        }
                     }
                 }
                 goto nextPage;
@@ -787,13 +789,15 @@ sub crawl {
             
             # standard no page constraint condition
             my $findings = grab $selector, ':all';
-            if ("array" eq lc ref $findings) {
-                foreach (@{$findings}) {
-                    $function->($_);
+            if ($findings) {
+                if ("array" eq lc ref $findings) {
+                    foreach (@{$findings}) {
+                        $function->($_);
+                    }
                 }
-            }
-            else {
-                $function->($findings);
+                else {
+                    $function->($findings);
+                }
             }
         }
     }
@@ -961,7 +965,7 @@ Scrappy - All Powerful Web Harvester, Spider, Scraper fully automated
 
 =head1 VERSION
 
-version 0.6
+version 0.61
 
 =head1 SYNOPSIS
 

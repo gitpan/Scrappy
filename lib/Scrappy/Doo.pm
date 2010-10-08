@@ -1,7 +1,7 @@
 # ABSTRACT: A Magical Scrappy Namespace Where Wild Things Are
 package Scrappy::Doo;
 BEGIN {
-  $Scrappy::Doo::VERSION = '0.6';
+  $Scrappy::Doo::VERSION = '0.61';
 }
 use Scrappy qw/:syntax/;
 1;
@@ -14,7 +14,7 @@ Scrappy::Doo - A Magical Scrappy Namespace Where Wild Things Are
 
 =head1 VERSION
 
-version 0.6
+version 0.61
 
 =head1 AUTHOR
 

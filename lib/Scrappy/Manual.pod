@@ -12,7 +12,7 @@ Scrappy::Manual - How Do I Command The All Powerful Web Scraper Scrappy?
 
 =head1 VERSION
 
-version 0.6
+version 0.61
 
 =head1 DISCLAIMER
 
