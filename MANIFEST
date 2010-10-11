@@ -10,7 +10,6 @@ lib/Scrappy/Crawler.pm
 lib/Scrappy/Doo.pm
 lib/Scrappy/Element.pm
 lib/Scrappy/Manual.pod
-scrappy.kpf
 share/support/chrome.txt
 share/support/explorer.txt
 share/support/firefox.txt

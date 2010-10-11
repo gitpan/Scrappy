@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy::Crawler;
 BEGIN {
-  $Scrappy::Crawler::VERSION = '0.61';
+  $Scrappy::Crawler::VERSION = '0.62';
 }
 
 sub new {
@@ -22,7 +22,7 @@ Scrappy::Crawler - Fully Automated Web Crawler
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 AUTHOR
 

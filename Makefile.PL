@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     'File::ShareDir' => '0',
     'File::Slurp' => '0',
     'HTML::TreeBuilder' => '0',
+    'Parallel::ForkManager' => '0',
     'Test::More' => '0',
     'Try::Tiny' => '0',
     'URI' => '0',
@@ -34,7 +35,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.61',
+  'VERSION' => '0.62',
   'test' => {
     'TESTS' => 't/*.t'
   }

@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.61';
+  $Scrappy::VERSION = '0.62';
 }
 
 use FindBin;
@@ -618,6 +618,7 @@ our $_cursor = 0;
 
 
 sub cursor {
+    my $self = 'Scrappy' eq ref $_[0] ? shift @_ : undef;
     $_cursor = $_[0] if $_[0];
     return $_cursor;
 }
@@ -625,7 +626,19 @@ sub cursor {
 
 sub queue {
     my $self    = 'Scrappy' eq ref $_[0] ? shift @_ : undef;
-    return @_ ? push @_queue, @_ : @_queue;
+    my @url = @_;
+    # Scrappy::Element href attribute now automatically turns relative URLs
+    # into absolute ones
+    
+    #if (@url) {
+    #    foreach my $u (@url) {
+    #        $u = URI->new_abs($u, domain)->as_string;
+    #    }
+    #    push @_queue, @url;
+    #}
+    
+    push @_queue, @url;
+    return @_queue;
 }
 
 
@@ -776,11 +789,11 @@ sub crawl {
                     if ($findings) {
                         if ("array" eq lc ref $findings) {
                             foreach (@{$findings}) {
-                                $function->($_);
+                                $function->($_) if $_;
                             }
                         }
                         else {
-                            $function->($findings);
+                            $function->($findings) if $findings;
                         }
                     }
                 }
@@ -792,11 +805,11 @@ sub crawl {
             if ($findings) {
                 if ("array" eq lc ref $findings) {
                     foreach (@{$findings}) {
-                        $function->($_);
+                        $function->($_) if $_;
                     }
                 }
                 else {
-                    $function->($findings);
+                    $function->($findings) if $findings;
                 }
             }
         }
@@ -806,7 +819,128 @@ sub crawl {
     goto doPage if $_queue[++$_cursor];
 }
 
-## UTILITIES (Not OO nor DSL, Internal Only)
+
+sub crawlers {
+    my $self = 'Scrappy' eq ref $_[0] ? shift @_ : undef;
+    
+    my $ppid = undef;
+    
+    my @array = @_;
+    
+    my $instances = shift @array;
+    my $actions   = pop @array;
+    my $url       = shift @array;
+    
+    die 'the crawlers function needs the number of processes to spawn,
+    the starting URL and actions to proceed' unless $url && $actions && $instances;
+    
+    require Parallel::ForkManager;
+    my $forker = new Parallel::ForkManager($instances);
+    
+    queue $url, @array if @array;
+    
+    $_queue[$_cursor] = $url;
+    
+    my $forking = 0;
+    my $visited = {};
+    
+    # merge stash and queue from forked processes
+    $forker->run_on_finish( sub {
+            my ( $pid, $xcode, $ident, $xsig, $dump, $passback ) = @_;
+            # retrieve data structure from child
+            if (defined($passback)) {
+                if ("HASH" eq ref $passback) {
+                    if ( $passback->{vars} && $passback->{queue} ) {
+                        if ("HASH" eq ref $passback->{vars}) {
+                            self->{Prop}->{stash} = +{ %{$passback->{vars}} };
+                        }
+                        if ("ARRAY" eq ref $passback->{queue}) {
+                            push @_queue, $_ for @{$passback->{queue}};
+                        }
+                    }
+                }
+            }
+        }
+    );
+    
+    while (my $curl = shift @_queue) {
+        
+        my $get_fail = 0;
+        
+        # don't process the same url twice
+        # console('url-skip', $curl) if $visited->{$curl};
+        next if $visited->{$curl}++; 
+        
+        # start forking when queue has a url for each fork
+        if (@_queue >= $instances) {
+            $forker->start and next;
+            $forking = 1;
+        }
+        
+        # start processing
+        try {
+            get $curl;
+        }
+        catch {
+            console('no-fetch', "http error " . status() . " $curl");
+            $get_fail++;
+        };
+        
+        $forker->finish and next if $get_fail;
+        
+        console('fetch-ok', "fetched $curl");
+        
+        # process actions
+        if ("hash" eq lc ref $actions) {
+            # while (my($selector, $function) = each(%{$actions}))
+            foreach my $action (keys %{$actions}) {
+                my ($selector, $function) = ($action, $actions->{$action});
+                
+                # page constraint condition
+                if ("code" ne lc ref $function) {
+                    my $route = $selector;
+                    $selector = (keys %{$actions->{$selector}})[0];
+                    $function = $action = $actions->{$route}->{$selector};                
+                    if (match $route) {
+                        my $findings = grab $selector, ':all';
+                        if ($findings) {
+                            if ("array" eq lc ref $findings) {
+                                foreach (@{$findings}) {
+                                    $function->($_) if $_;
+                                }
+                            }
+                            else {
+                                $function->($findings) if $findings;
+                            }
+                        }
+                    }
+                    next;
+                }
+                
+                # standard no page constraint condition
+                my $findings = grab $selector, ':all';
+                if ($findings) {
+                    if ("array" eq lc ref $findings) {
+                        foreach (@{$findings}) {
+                            $function->($_) if $_;
+                        }
+                    }
+                    else {
+                        $function->($findings) if $findings;
+                    }
+                }
+            }
+        }
+        
+        $forker->finish(0, { vars => self->var, queue => \@_queue })
+        if $forking;
+        
+    }
+    
+    $forker->wait_all_children;
+}
+
+# utilities (not oo nor dsl, internal only)
 
 sub element {
     my $object = shift;
@@ -820,6 +954,15 @@ sub element {
                 *{"Scrappy::Element::$attr"} = sub {
                     return shift->{$attr};
                 }
+            }
+        }
+        # special processing for URLs, turn relative into absolute
+        {
+            no warnings 'redefine';
+            no strict 'refs';
+            *{"Scrappy::Element::href"} = sub {
+                my $u = shift->{href};
+                return URI->new_abs($u, domain())->as_string;
             }
         }
         bless $element, 'Scrappy::Element';
@@ -955,6 +1098,10 @@ sub tattr {
     # need xml and json support maybe?
 }
 
+sub console {
+    print "! [". (shift) ."] " . join (", ", @_) . "\n" if $ENV{ScrappyTrace};
+}
+
 1;
 __END__
 =pod
@@ -965,7 +1112,7 @@ Scrappy - All Powerful Web Harvester, Spider, Scraper fully automated
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 SYNOPSIS
 
@@ -1523,6 +1670,23 @@ and every page crawled thereafter, Scrappy will look for the 'a' tag (links) and
 only if they match the defined URL pattern. Also, you'll notice the slightly different structure for the
 second action, which denotes a page action. This basically reads, if the current page matches this URL pattern
 apply the corresponding element actions.
+
+=head2 crawlers
+
+The crawlers method is designed to make forking your spider super simple. This method
+returns the PID (process ID) for the parent process. This method takes three arguments,
+the number of processes to spawn, and the starting url and selector actions, the same
+as the crawl method. The crawlers method will spawn the number of crawlers you specify
+exactly but will only spawn them when the queue has enough URLs for each of them to
+process. This means that if you desire 5 processes to performing the specified actions,
+it will only spawn them when the queue has 5 or more URLs in it.
+
+    crawlers 10, $starting_url, {
+        'a' => sub {
+            # find all links and add them to the queue to be crawled
+            queue shift->href;
+        }
+    };
 
 =head1 AUTHOR
 

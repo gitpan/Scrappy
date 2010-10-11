@@ -5,7 +5,7 @@ use warnings;
 
 package Scrappy::Element;
 BEGIN {
-  $Scrappy::Element::VERSION = '0.61';
+  $Scrappy::Element::VERSION = '0.62';
 }
 
 sub new {
@@ -22,7 +22,7 @@ Scrappy::Element - Selected Element Object Instance
 
 =head1 VERSION
 
-version 0.61
+version 0.62
 
 =head1 AUTHOR
 

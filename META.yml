@@ -6,7 +6,7 @@ build_requires: {}
 configure_requires:
   ExtUtils::MakeMaker: 6.31
   File::ShareDir::Install: 0.03
-generated_by: 'Dist::Zilla version 2.101310'
+generated_by: 'Dist::Zilla version 2.101241'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -18,10 +18,11 @@ requires:
   File::ShareDir: 0
   File::Slurp: 0
   HTML::TreeBuilder: 0
+  Parallel::ForkManager: 0
   Test::More: 0
   Try::Tiny: 0
   URI: 0
   WWW::Mechanize: 0
   Web::Scraper: 0
   YAML::Syck: 0
-version: 0.61
+version: 0.62
