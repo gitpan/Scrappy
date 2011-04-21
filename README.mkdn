@@ -1,69 +1,12 @@
-# ABSTRACT: All Powerful Web Spidering, Scrapering, Crawling Framework
-# Dist::Zilla: +PodWeaver
-package Scrappy;
-BEGIN {
-  $Scrappy::VERSION = '0.9111110';
-}
-
-# load OO System
-use Moose;
-
-# load other libraries
-use Carp;
-extends 'Scrappy::Scraper';
-
-
-
-sub crawl {
-    my ($self, $starting_url, %pages) = @_;
-
-    croak(
-        'Please provide a starting URL and a valid configuration before crawling'
-    ) unless ($self && $starting_url && keys %pages);
-
-    # register the starting url
-    $self->queue->add($starting_url);
-
-    # start the crawl loop
-    while (my $url = $self->queue->next) {
-
-        # check if the url matches against any registered pages
-        foreach my $page (keys %pages) {
-            my $data = $self->page_match($page, $url);
-
-            if ($data) {
-
-                # found a page match, fetch and scrape the page for data
-                $self->get($url);
-
-                foreach my $selector (keys %{$pages{$page}}) {
-
-                    # loop through resultset
-                    foreach my $item (@{$self->select($selector)->data}) {
-
-                        # execute selector code
-                        $pages{$page}->{$selector}->($self, $item, $data);
-                    }
-                }
-            }
-        }
-    }
-}
-
-1;
-
-__END__
-=pod
-
-=head1 NAME
+# NAME
 
 Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
 
-=head1 VERSION
+# VERSION
 
 version 0.9111110
 
-=head1 SYNOPSIS
+# SYNOPSIS
 
     #!/usr/bin/perl
     use Scrappy;
@@ -77,7 +20,7 @@ version 0.9111110
             }
         );
 
-=head1 DESCRIPTION
+# DESCRIPTION
 
 Scrappy is an easy (and hopefully fun) way of scraping, spidering, and/or
 harvesting information from web pages, web services, and more. Scrappy is a
@@ -87,9 +30,9 @@ Scrappy (pronounced Scrap+Pee) == 'Scraper Happy' or 'Happy Scraper'; If you
 like you may call it Scrapy (pronounced Scrape+Pee) although Python has a web
 scraping framework by that name and this module is not a port of that one.
 
-=head1 METHODS
+# METHODS
 
-=head2 crawl
+## crawl
 
 The crawl method is very useful when it is desired to crawl an entire website or
 at-least partially, it automates the tasks of creating a queue, fetching and
@@ -98,46 +41,52 @@ a simplified example, ... the following is a more complex example.
 
     my  $scrappy = Scrappy->new;
     
+
     $scrappy->crawl('http://search.cpan.org/recent',
         '/recent' => {
             
+
             '#cpansearch li a' => sub {
                 my ($self, $item) = @_;
                 # follow all recent modules from search.cpan.org
                 $self->queue->add($item->{href});
             }
             
+
         },
         '/~:author/:name-:version/' => {
             
+
             'body' => sub {
                 my ($self, $item, $args) = @_;
                 
+
                 my $reviews = $self
                 ->select('.box table tr')->focus(3)->select('td.cell small a')
                 ->data->[0]->{text};
                 
+
                 $reviews = $reviews =~ /\d+ Reviews/ ?
                     $reviews : '0 reviews';
                 
+
                 print "found $args->{name} version $args->{version} ".
                     "[$reviews] by $args->{author}\n";
                 
+
             }
             
+
         }
     );
 
-=head1 AUTHOR
+# AUTHOR
 
 Al Newkirk <awncorp@cpan.org>
 
-=head1 COPYRIGHT AND LICENSE
+# COPYRIGHT AND LICENSE
 
 This software is copyright (c) 2010 by awncorp.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-=cut
-
