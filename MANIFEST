@@ -19,6 +19,7 @@ lib/Scrappy/Scraper/Control.pm
 lib/Scrappy/Scraper/Parser.pm
 lib/Scrappy/Scraper/UserAgent.pm
 lib/Scrappy/Session.pm
+perlpod.pl
 share/support/chrome.txt
 share/support/explorer.txt
 share/support/firefox.txt

@@ -4,7 +4,7 @@
 package Scrappy;
 
 BEGIN {
-    $Scrappy::VERSION = '0.9111120';
+    $Scrappy::VERSION = '0.9111121';
 }
 
 # load OO System
@@ -64,7 +64,7 @@ Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
 
 =head1 VERSION
 
-version 0.9111120
+version 0.9111121
 
 =head1 SYNOPSIS
 
@@ -80,9 +80,9 @@ version 0.9111120
                 }
             }
         );
-        
-    ... without crawl, the above is similar to the following ...
-    
+
+And now manually, ... without crawl, the above is similar to the following ...
+
     #!/usr/bin/perl
     use Scrappy;
 
@@ -109,6 +109,110 @@ feature rich, flexible, intelligent web automation tool.
 Scrappy (pronounced Scrap+Pee) == 'Scraper Happy' or 'Happy Scraper'; If you
 like you may call it Scrapy (pronounced Scrape+Pee) although Python has a web
 scraping framework by that name and this module is not a port of that one.
+
+=head2 FEATURES
+
+Scrappy provides a framework containing all the tools neccessary to create a
+simple yet powerful web scraper. At its core, Scrappy loads an array of
+features for access control, event logging, session handling, url matching,
+web request and response handling, proxy management, web scraping, and downloading.
+
+Futhermore, Scrappy provides a simple Moose-based plugin system that allows Scrappy
+to be easily extended.
+
+    my  $scraper = Scrappy->new;
+    
+        $scraper->control;      # Scrappy::Scraper::Control (access control)
+        $scraper->parser;       # Scrappy::Scraper::Parser (web scraper)
+        $scraper->user_agent;   # Scrappy::Scraper::UserAgent (user-agent tools)
+        $scraper->logger;       # Scrappy::Logger (event logger)
+        $scraper->queue;        # Scrappy::Queue (flow control for loops)
+        $scraper->session;      # Scrappy::Session (session management)
+
+Please see the METHODS section for a more in-depth look at all Scrappy
+functionality.
+
+=head2 ATTRIBUTES
+
+The following is a list of object attributes available with every Scrappy instance.
+
+=head3 content
+
+The content attribute holds the L<HTTP::Response> object of the current request.
+
+    my  $scraper = Scrappy->new;
+        $scraper->content;
+
+=head3 control
+
+The control attribute holds the L<Scrappy::Scraper::Control> object which is used
+the provide access conrtol to the scraper.
+
+    my  $scraper = Scrappy->new;
+        $scraper->control;
+
+=head3 debug
+
+The debug attribute holds a boolean which controls whether event logs are captured.
+
+    my  $scraper = Scrappy->new;
+        $scraper->debug(1);
+
+=head3 logger
+
+The logger attribute holds the L<Scrappy::Logger> object which is used to provide
+event logging capabilities to the scraper.
+
+    my  $scraper = Scrappy->new;
+        $scraper->logger;
+
+=head3 parser
+
+The parser attribute holds the L<Scrappy::Scraper::Parser> object which is used
+to scrape html data from the specified source material.
+
+    my  $scraper = Scrappy->new;
+        $scraper->parser;
+
+=head3 plugins
+
+The plugins attribute holds the L<Scrappy::Plugin> object which is an interface
+used to load plugins.
+
+    my  $scraper = Scrappy->new;
+        $scraper->plugins;
+
+=head3 queue
+
+The queue attribute holds the L<Scrappy::Queue> object which is used to provide
+flow-control for the standard loop approach to crawling.
+
+    my  $scraper = Scrappy->new;
+        $scraper->queue;
+
+=head3 session
+
+The session attribute holds the L<Scrappy::Session> object which is used to provide
+session support and persistent data across executions.
+
+    my  $scraper = Scrappy->new;
+        $scraper->session;
+
+=head3 user_agent
+
+The user_agent attribute holds the L<Scrappy::Scraper::UserAgent> object which is
+used to set and manipulate the user-agent header of the scraper.
+
+    my  $scraper = Scrappy->new;
+        $scraper->user_agent;
+
+=head3 worker
+
+The worker attribute holds the L<WWW::Mechanize> object which is used navigate web
+pages and provide request and response header information.
+
+    my  $scraper = Scrappy->new;
+        $scraper->worker;
 
 =head1 METHODS
 
@@ -229,6 +333,36 @@ HTTP::Response object.
     my  $scraper = Scrappy->new;
     my  $response = $scraper->get($new_url);
 
+=head2 log
+
+The log method logs an event with the event logger.
+
+    my  $scraper = Scrappy->new;
+        
+        $scraper->debug(1); # unneccessary, on by default
+        $scraper->logger->verbose(1); # more detailed log
+        
+        $scraper->log('error', 'Somthing bad happened');
+        
+        ...
+        
+        $scraper->log('info', 'Somthing happened');
+        $scraper->log('warn', 'Somthing strange happened');
+        $scraper->log('coolness', 'Somthing cool happened');
+
+Note! Event logs are always recorded but never automatically written to a file
+unless explicitly told to do so using the following:
+
+        $scraper->logger->write('log.yml');
+
+=head2 page_content_type
+
+The page_content_type method returns the content_type of the current page.
+
+    my  $scraper = Scrappy->new;
+        $scraper->get('http://www.google.com/');
+        print $scraper->page_content_type; # prints text/html
+
 =head2 page_data
 
 The page_data method returns the HTML content of the current page, additionally
@@ -239,26 +373,6 @@ current page with that data and returns the modified content.
         $scraper->get(...);
     my  $html = $scraper->page_data;
 
-=head2 page_loaded
-
-The page_loaded method returns true/false based on whether the last request was
-successful.
-
-    my $scraper = Scrappy->new;
-    
-        $scraper->get($requested_url);
-        if ($scraper->page_loaded) {
-            ...
-        }
-
-=head2 page_content_type
-
-The page_content_type method returns the content_type of the current page.
-
-    my  $scraper = Scrappy->new;
-        $scraper->get('http://www.google.com/');
-        print $scraper->page_content_type; # prints text/html
-
 =head2 page_ishtml
 
 The page_ishtml method returns true/false based on whether our content is HTML,
@@ -268,6 +382,18 @@ according to the HTTP headers.
     
         $scraper->get($requested_url);
         if ($scraper->is_html) {
+            ...
+        }
+
+=head2 page_loaded
+
+The page_loaded method returns true/false based on whether the last request was
+successful.
+
+    my $scraper = Scrappy->new;
+    
+        $scraper->get($requested_url);
+        if ($scraper->page_loaded) {
             ...
         }
 
@@ -345,6 +471,34 @@ is HTML, otherwise returns undef.
         
     my  $title = $scraper->page_title;
         print $title; # print Google
+
+=head2 pause
+
+This method sets breaks between your requests in an attempt to simulate human
+interaction. 
+
+    my  $scraper = Scrappy->new;
+        $scraper->pause(20);
+    
+        $scraper->get($request_1);
+        $scraper->get($request_2);
+        $scraper->get($request_3);
+
+Given the above example, there will be a 20 sencond break between each request made,
+get, post, request, etc., You can also specify a range to have the pause method
+select from at random...
+
+        $scraper->pause(5,20);
+    
+        $scraper->get($request_1);
+        $scraper->get($request_2);
+    
+        # reset/turn it off
+        $scraper->pause(0);
+    
+        print "I slept for ", ($scraper->pause), " seconds";
+
+Note! The download method is exempt from any automatic pausing.
 
 =head2 plugin
 
@@ -444,56 +598,6 @@ return boolean, 1 if the current page doesn't match the requested page.
         # resume ...
     }
 
-=head2 log
-
-The log method logs an event with the event logger.
-
-    my  $scraper = Scrappy->new;
-        
-        $scraper->debug(1); # unneccessary, on by default
-        $scraper->logger->verbose(1); # more detailed log
-        
-        $scraper->log('error', 'Somthing bad happened');
-        
-        ...
-        
-        $scraper->log('info', 'Somthing happened');
-        $scraper->log('warn', 'Somthing strange happened');
-        $scraper->log('coolness', 'Somthing cool happened');
-
-Note! Event logs are always recorded but never automatically written to a file
-unless explicitly told to do so using the following:
-
-        $scraper->logger->write('log.yml');
-
-=head2 pause
-
-This method sets breaks between your requests in an attempt to simulate human
-interaction. 
-
-    my  $scraper = Scrappy->new;
-        $scraper->pause(20);
-    
-        $scraper->get($request_1);
-        $scraper->get($request_2);
-        $scraper->get($request_3);
-
-Given the above example, there will be a 20 sencond break between each request made,
-get, post, request, etc., You can also specify a range to have the pause method
-select from at random...
-
-        $scraper->pause(5,20);
-    
-        $scraper->get($request_1);
-        $scraper->get($request_2);
-    
-        # reset/turn it off
-        $scraper->pause(0);
-    
-        print "I slept for ", ($scraper->pause), " seconds";
-
-Note! The download method is exempt from any automatic pausing.
-
 =head2 response
 
 The response method returns the HTTP::Repsonse object of the current page.
@@ -501,6 +605,35 @@ The response method returns the HTTP::Repsonse object of the current page.
     my  $scraper = Scrappy->new;
         $scraper->get(...);
     my  $res = $scraper->response;
+
+=head2 select
+
+The select method takes XPATH or CSS selectors and returns a
+L<Scrappy::Scraper::Parser> object which contains the matching elements.
+
+    my $scraper = Scrappy->new;
+    
+    # return a list of links
+    my $list = $scraper->select('#profile li a')->data; # see Scrappy::Scraper::Parser
+    
+    foreach my $link (@{$list}) {
+        print $link->{href}, "\n";
+    }
+    
+    # Zoom in on specific chunks of html code using the following ...
+    my $list = $scraper
+    ->select('#container table tr') # select all rows
+    ->focus(4) # focus on the 5th row
+    ->select('div div')->data;
+    
+    # The code above selects the div > div inside of the 5th tr in #container table
+    # Access tag html, text and other attributes as follows...
+    
+    $element = $scraper->select('table')->data->[0];
+    $element->{html}; # HTML representation of the table
+    $element->{text}; # Table stripped of all HTML
+    $element->{cellpadding}; # cellpadding
+    $element->{height}; # ...
 
 =head2 stash
 
@@ -533,139 +666,6 @@ The url method returns the complete URL for the current page.
     my  $scraper = Scrappy->new;
         $scraper->get('http://www.google.com/');
         print $scraper->url; # prints http://www.google.com/
-
-=head1 FEATURES
-
-Scrappy provides a framework containing all the tools neccessary to create a
-simple yet powerful web scraper. At its core, Scrappy loads an array of
-features for access control, execution logging, session handling, url matching,
-web request and response handling, proxy management, web scraping, and downloading.
-
-Futhermore, Scrappy provide a simple Moose-based plugin system that allows Scrappy
-to be easily extended.
-
-    my  $scraper = Scrappy->new;
-    
-        $scraper->control;      # Scrappy::Scraper::Control (access control)
-        $scraper->parser;       # Scrappy::Scraper::Parser (web scraper)
-        $scraper->user_agent;   # Scrappy::Scraper::UserAgent (user-agent tools)
-        $scraper->logger;       # Scrappy::Logger (event logger)
-        $scraper->queue;        # Scrappy::Queue (flow control for loops)
-        $scraper->session;      # Scrappy::Session (session management)
-
-Please see the METHODS section for a more in-depth look at all Scrappy
-functionality.
-
-=head1 ATTRIBUTES
-
-The following is a list of object attributes available with every Scrappy instance.
-
-=head2 content
-
-The content attribute holds the L<HTTP::Response> object of the current request.
-
-    my  $scraper = Scrappy->new;
-        $scraper->content;
-
-=head2 control
-
-The control attribute holds the L<Scrappy::Scraper::Control> object which is used
-the provide access conrtol to the scraper.
-
-    my  $scraper = Scrappy->new;
-        $scraper->control;
-
-=head2 debug
-
-The debug attribute holds a boolean which controls whether event logs are captured.
-
-    my  $scraper = Scrappy->new;
-        $scraper->debug(1);
-
-=head2 logger
-
-The logger attribute holds the L<Scrappy::Logger> object which is used to provide
-event logging capabilities to the scraper.
-
-    my  $scraper = Scrappy->new;
-        $scraper->logger;
-
-=head2 parser
-
-The parser attribute holds the L<Scrappy::Scraper::Parser> object which is used
-to scrape html data from the specified source material.
-
-    my  $scraper = Scrappy->new;
-        $scraper->parser;
-
-=head2 plugins
-
-The plugins attribute holds the L<Scrappy::Plugin> object which is an interface
-used to load plugins.
-
-    my  $scraper = Scrappy->new;
-        $scraper->plugins;
-
-=head2 queue
-
-The queue attribute holds the L<Scrappy::Queue> object which is used to provide
-flow-control for the standard loop approach to crawling.
-
-    my  $scraper = Scrappy->new;
-        $scraper->queue;
-
-=head2 session
-
-The session attribute holds the L<Scrappy::Session> object which is used to provide
-session support and persistent data across executions.
-
-    my  $scraper = Scrappy->new;
-        $scraper->session;
-
-=head2 user_agent
-
-The user_agent attribute holds the L<Scrappy::Scraper::UserAgent> object which is
-used to set and manipulate the user-agent header of the scraper.
-
-    my  $scraper = Scrappy->new;
-        $scraper->user_agent;
-
-=head2 worker
-
-The worker attribute holds the L<WWW::Mechanize> object which is used navigate web
-pages and provide request and response header information.
-
-    my  $scraper = Scrappy->new;
-        $scraper->worker;
-
-=head2 select
-
-The select method takes XPATH or CSS selectors and returns an arrayref
-with the matching elements.
-
-    my $scraper = Scrappy->new;
-    
-    # return a list of links
-    my $list = $scraper->select('#profile li a')->data; # see Scrappy::Scraper::Parser
-    
-    foreach my $link (@{$list}) {
-        print $link->{href}, "\n";
-    }
-    
-    # Zoom in on specific chunks of html code using the following ...
-    my $list = $scraper
-    ->select('#container table tr') # select all rows
-    ->focus(4) # focus on the 5th row
-    ->select('div div')->data;
-    
-    # The code above selects the div > div inside of the 5th tr in #container table
-    # Access tag html, text and other attributes as follows...
-    
-    $element = $scraper->select('table')->data->[0];
-    $element->{html}; # HTML representation of the table
-    $element->{text}; # Table stripped of all HTML
-    $element->{cellpadding}; # cellpadding
-    $element->{height}; # ...
 
 =head1 AUTHOR
 
