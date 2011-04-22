@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
     'Cwd' => '0',
     'DateTime' => '0',
     'DateTime::Format::SQLite' => '0',
+    'File::Find::Rule' => '0',
     'File::ShareDir' => '0',
     'File::Slurp' => '0',
     'File::Util' => '0',
@@ -40,7 +41,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.9111110',
+  'VERSION' => '0.9111120',
   'test' => {
     'TESTS' => 't/*.t'
   }

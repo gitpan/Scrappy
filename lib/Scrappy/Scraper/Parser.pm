@@ -1,6 +1,7 @@
 package Scrappy::Scraper::Parser;
+
 BEGIN {
-  $Scrappy::Scraper::Parser::VERSION = '0.9111110';
+    $Scrappy::Scraper::Parser::VERSION = '0.9111120';
 }
 
 # load OO System
@@ -167,8 +168,9 @@ sub focus {
 }
 
 sub scrape {
-    my ($self, $selector) = @_;
+    my ($self, $selector, $html) = @_;
 
+    $self->html($html) if $html;
     $self->is_html;
 
     $self->select($selector);
@@ -176,8 +178,9 @@ sub scrape {
 }
 
 sub select {
-    my ($self, $selector) = @_;
+    my ($self, $selector, $html) = @_;
 
+    $self->html($html) if $html;
     $self->is_html;
 
     $self->worker->{code} = scraper {
