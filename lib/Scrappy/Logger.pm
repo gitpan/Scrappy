@@ -1,7 +1,6 @@
 package Scrappy::Logger;
-
 BEGIN {
-    $Scrappy::Logger::VERSION = '0.9111121';
+  $Scrappy::Logger::VERSION = '0.9111150';
 }
 
 # load OO System

@@ -4,7 +4,7 @@ Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
 
 # VERSION
 
-version 0.9111121
+version 0.9111150
 
 # SYNOPSIS
 

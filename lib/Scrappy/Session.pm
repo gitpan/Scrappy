@@ -1,7 +1,6 @@
 package Scrappy::Session;
-
 BEGIN {
-    $Scrappy::Session::VERSION = '0.9111121';
+  $Scrappy::Session::VERSION = '0.9111150';
 }
 
 # load OO System

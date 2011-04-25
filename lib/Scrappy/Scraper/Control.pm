@@ -1,7 +1,6 @@
 package Scrappy::Scraper::Control;
-
 BEGIN {
-    $Scrappy::Scraper::Control::VERSION = '0.9111121';
+  $Scrappy::Scraper::Control::VERSION = '0.9111150';
 }
 
 # load OO System

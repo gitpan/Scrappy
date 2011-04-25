@@ -2,9 +2,8 @@
 # Dist::Zilla: +PodWeaver
 
 package Scrappy;
-
 BEGIN {
-    $Scrappy::VERSION = '0.9111121';
+  $Scrappy::VERSION = '0.9111150';
 }
 
 # load OO System
@@ -13,7 +12,6 @@ use Moose;
 # load other libraries
 use Carp;
 extends 'Scrappy::Scraper';
-
 
 sub crawl {
     my ($self, $starting_url, %pages) = @_;
@@ -49,13 +47,42 @@ sub crawl {
             }
         }
     }
+    
+    return $self;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 1;
 
 __END__
-
 =pod
 
 =head1 NAME
@@ -64,7 +91,7 @@ Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
 
 =head1 VERSION
 
-version 0.9111121
+version 0.9111150
 
 =head1 SYNOPSIS
 

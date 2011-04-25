@@ -24,6 +24,7 @@ requires:
   File::Util: 0
   HTML::TreeBuilder: 0
   Parallel::ForkManager: 0
+  String::TT: 0
   Template: 0
   Test::More: 0
   Try::Tiny: 0
@@ -31,4 +32,4 @@ requires:
   WWW::Mechanize: 0
   Web::Scraper: 0
   YAML::Syck: 0
-version: 0.9111121
+version: 0.9111150
