@@ -1,8 +1,9 @@
 NAME
-    Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
+    Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling
+    Framework
 
 VERSION
-    version 0.9111150
+    version 0.9111180
 
 SYNOPSIS
         #!/usr/bin/perl
@@ -72,11 +73,12 @@ DESCRIPTION
 
   ATTRIBUTES
     The following is a list of object attributes available with every
-    Scrappy instance.
+    Scrappy instance, attributes always return an instance of the class they
+    represent.
 
    content
     The content attribute holds the HTTP::Response object of the current
-    request.
+    request. Returns undef if no page has been successfully fetched.
 
         my  $scraper = Scrappy->new;
             $scraper->content;
@@ -87,6 +89,10 @@ DESCRIPTION
 
         my  $scraper = Scrappy->new;
             $scraper->control;
+            
+        ... $scraper->control->restrict('google.com');
+            ... $scraper->control->allow('cpan.org');
+            ... if $scraper->control->is_allowed($url);
 
    debug
     The debug attribute holds a boolean which controls whether event logs
@@ -148,8 +154,8 @@ DESCRIPTION
 METHODS
   back
     The back method is the equivalent of hitting the "back" button in a
-    browser, it returns the previous page (response), it will not backtrack
-    beyond the first request.
+    browser, it returns the previous page (response) and returns that URL,
+    it will not backtrack beyond the first request.
 
         my  $scraper = Scrappy->new;
             
@@ -157,7 +163,7 @@ METHODS
             ...
             $scraper->get(...);
             ...
-            $scraper->back;
+            my $last_url = $scraper->back;
 
   cookies
     The cookies method returns an HTTP::Cookie object. Note! Cookies can be
@@ -205,7 +211,8 @@ METHODS
             );
 
   domain
-    The domain method returns the domain host of the current page.
+    The domain method returns the domain host of the current page. Local
+    pages, e.g. file:///this/that/the_other will return undef.
 
         my  $scraper = Scrappy->new;
         

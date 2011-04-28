@@ -1,9 +1,10 @@
-# ABSTRACT: All Powerful Web Spidering, Scrapering, Crawling Framework
+# ABSTRACT: The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 # Dist::Zilla: +PodWeaver
 
 package Scrappy;
+
 BEGIN {
-  $Scrappy::VERSION = '0.9111150';
+    $Scrappy::VERSION = '0.9111180';
 }
 
 # load OO System
@@ -47,51 +48,24 @@ sub crawl {
             }
         }
     }
-    
+
     return $self;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 1;
 
 __END__
+
 =pod
 
 =head1 NAME
 
-Scrappy - All Powerful Web Spidering, Scrapering, Crawling Framework
+Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.9111150
+version 0.9111180
 
 =head1 SYNOPSIS
 
@@ -161,11 +135,13 @@ functionality.
 
 =head2 ATTRIBUTES
 
-The following is a list of object attributes available with every Scrappy instance.
+The following is a list of object attributes available with every Scrappy instance,
+attributes always return an instance of the class they represent.
 
 =head3 content
 
 The content attribute holds the L<HTTP::Response> object of the current request.
+Returns undef if no page has been successfully fetched.
 
     my  $scraper = Scrappy->new;
         $scraper->content;
@@ -177,6 +153,10 @@ the provide access conrtol to the scraper.
 
     my  $scraper = Scrappy->new;
         $scraper->control;
+        
+        ... $scraper->control->restrict('google.com');
+        ... $scraper->control->allow('cpan.org');
+        ... if $scraper->control->is_allowed($url);
 
 =head3 debug
 
@@ -246,7 +226,8 @@ pages and provide request and response header information.
 =head2 back
 
 The back method is the equivalent of hitting the "back" button in a browser, it
-returns the previous page (response), it will not backtrack beyond the first request.
+returns the previous page (response) and returns that URL, it will not backtrack
+beyond the first request.
 
     my  $scraper = Scrappy->new;
         
@@ -254,7 +235,7 @@ returns the previous page (response), it will not backtrack beyond the first req
         ...
         $scraper->get(...);
         ...
-        $scraper->back;
+        my $last_url = $scraper->back;
 
 =head2 cookies
 
@@ -304,7 +285,8 @@ a simplified example, ... the following is a more complex example.
 
 =head2 domain
 
-The domain method returns the domain host of the current page.
+The domain method returns the domain host of the current page. Local pages, e.g.
+file:///this/that/the_other will return undef.
 
     my  $scraper = Scrappy->new;
     

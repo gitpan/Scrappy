@@ -1,6 +1,7 @@
 package Scrappy::Action;
+
 BEGIN {
-  $Scrappy::Action::VERSION = '0.9111150';
+    $Scrappy::Action::VERSION = '0.9111180';
 }
 
 use Moose;
@@ -35,9 +36,9 @@ sub actions {
     my @files =
       File::Find::Rule->file()->name('*.pm')
       ->in(map {"$_/Scrappy/Action"} @INC);
-      
-    my %actions = map { $_ => 1 } @files; #uniquenes
-    
+
+    my %actions = map { $_ => 1 } @files;    #uniquenes
+
     for my $action (keys %actions) {
 
         my ($plug) = $action =~ /(Scrappy\/Action\/.*)\.pm/;
@@ -53,8 +54,8 @@ sub actions {
 }
 
 sub load_action {
-    my $self    = shift;
-    my $action  = shift;
+    my $self   = shift;
+    my $action = shift;
 
     unless ($action =~ /^Scrappy::Action::/) {
 
@@ -78,54 +79,60 @@ sub load_action {
     elsif ($self->registry->{lc($action)}) {
         return $self->registry->{lc($action)};
     }
-    
+
     return 0;
 }
 
 # execute an action from the cli
 sub execute {
     my ($class, $action_class, $action, @options) = @_;
-    my  $self = ref $class ? $class : $class->new;
-    
-        # show help on syntax error
-        if (!$action_class || $action_class eq 'help') {
-            
-            with 'Scrappy::Action::Help';
-            print $self->menu;
-            exit;
-            
-        }
-        else {
-            if ($action) {
-                if ($action eq 'meta' || $action eq 'registry' ||
-                    $action eq 'actions' || $action eq 'load_action' ||
-                    $action eq 'execute') {
-                    
-                    with 'Scrappy::Action::Help';
-                    print $self->menu;
-                    exit;
-                }
+    my $self = ref $class ? $class : $class->new;
+
+    # show help on syntax error
+    if (!$action_class || $action_class eq 'help') {
+
+        with 'Scrappy::Action::Help';
+        print $self->menu;
+        exit;
+
+    }
+    else {
+        if ($action) {
+            if (   $action eq 'meta'
+                || $action eq 'registry'
+                || $action eq 'actions'
+                || $action eq 'load_action'
+                || $action eq 'execute')
+            {
+
+                with 'Scrappy::Action::Help';
+                print $self->menu;
+                exit;
             }
         }
-    
+    }
+
     # locate the action if installed
-    my  $requested_action = $self->load_action($action_class);
-    
+    my $requested_action = $self->load_action($action_class);
+
     if ($requested_action) {
+
         # load the desired action class
         with $requested_action;
-        
+
         # is actoin available
         unless ($action) {
             print $self->help($requested_action);
             exit;
         }
-        
+
         # run the requested action
-        print $self->meta->has_method($action) ?
-            $self->$action(@options) : $self->help($requested_action);
+        print $self->meta->has_method($action)
+          ? $self->$action(@options)
+          : $self->help($requested_action);
     }
     else {
+
         # ... or display the help menu
         with 'Scrappy::Action::Help';
         print $self->menu;

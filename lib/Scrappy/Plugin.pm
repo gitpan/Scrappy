@@ -1,6 +1,7 @@
 package Scrappy::Plugin;
+
 BEGIN {
-  $Scrappy::Plugin::VERSION = '0.9111150';
+    $Scrappy::Plugin::VERSION = '0.9111180';
 }
 
 # load OO System
@@ -38,7 +39,7 @@ has plugins => (
           File::Find::Rule->file()->name('*.pm')
           ->in(map {"$_/Scrappy/Plugin"} @INC);
 
-        my %plugins = map { $_ => 1 } @files; #uniquenes
+        my %plugins = map { $_ => 1 } @files;    #uniquenes
 
         for my $plugin (keys %plugins) {
 

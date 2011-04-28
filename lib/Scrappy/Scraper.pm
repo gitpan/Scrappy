@@ -1,6 +1,7 @@
 package Scrappy::Scraper;
+
 BEGIN {
-  $Scrappy::Scraper::VERSION = '0.9111150';
+    $Scrappy::Scraper::VERSION = '0.9111180';
 }
 
 # load OO System
@@ -113,10 +114,10 @@ sub back {
     # set html response
     $self->content($self->worker->back);
 
-    $self->log("info", "Navigated back to " . $self->page . " successfully");
+    $self->log("info", "Navigated back to " . $self->url . " successfully");
 
     $self->stash->{history} = [] unless defined $self->stash->{history};
-    push @{$self->stash->{history}}, $self->page;
+    push @{$self->stash->{history}}, $self->url;
     $self->worker->{cookie_jar}->scan(
         sub {
 
@@ -147,7 +148,7 @@ sub back {
         }
     );
 
-    return $self;
+    return $self->url;
 }
 
 sub cookies {
@@ -157,7 +158,7 @@ sub cookies {
 }
 
 sub domain {
-    return shift->worker->base;
+    return shift->worker->base->host;
 }
 
 sub download {
@@ -225,7 +226,7 @@ sub download {
 
 sub form {
     my $self = shift;
-    my $url  = URI->new($self->page);
+    my $url  = URI->new($self->url);
 
     # TODO: need to figure out how to determine the form action before submit
 
@@ -366,7 +367,7 @@ sub page_data {
         $self->worker->update_html($data);
     }
 
-    return $self->content->decoded_content(@args);
+    return $self->worker->content(@args);
 }
 
 sub page_content_type {
@@ -384,7 +385,7 @@ sub page_loaded {
 sub page_match {
     my $self    = shift;
     my $pattern = shift;
-    my $url     = shift || $self->page;
+    my $url     = shift || $self->url;
     $url = URI->new($url);
     my $options = shift || {};
 
@@ -475,6 +476,7 @@ sub page_match {
         }
         $match->{params} = {%args};
         $match->{params}->{splat} = \@splat if @splat;
+
         return $match;
     }
 
@@ -493,7 +495,7 @@ sub page_reload {
 
     $self->log("info", "page reload successful");
 
-    my $url = $self->page;
+    my $url = $self->url;
 
     $self->stash->{history} = [] unless defined $self->stash->{history};
     push @{$self->stash->{history}}, $url;
@@ -623,7 +625,7 @@ sub proxy {
 sub request_denied {
     my $self = shift;
     my ($last) = reverse @{$self->stash->{history}};
-    return 1 if ($self->page ne $last);
+    return 1 if ($self->url ne $last);
 }
 
 sub select {

@@ -1,6 +1,7 @@
 package Scrappy::Project;
+
 BEGIN {
-  $Scrappy::Project::VERSION = '0.9111150';
+    $Scrappy::Project::VERSION = '0.9111180';
 }
 
 use File::Find::Rule;
@@ -11,9 +12,9 @@ has app => (
     is      => 'ro',
     isa     => 'Any',
     default => sub {
-        my  $self = shift;
-            $self->scraper(Scrappy->new);
-        my  $meta = $self->meta;
+        my $self = shift;
+        $self->scraper(Scrappy->new);
+        my $meta = $self->meta;
         return $meta->has_method('setup') ? $self->setup : $self;
     }
 );
@@ -29,10 +30,9 @@ has parsers => (
         $class =~ s/::/\//g;
 
         my @files =
-          File::Find::Rule->file()->name('*.pm')
-          ->in( map { "$_/$class" } @INC );
+          File::Find::Rule->file()->name('*.pm')->in(map {"$_/$class"} @INC);
 
-        my %parsers = map { $_ => 1 } @files; #uniquenes
+        my %parsers = map { $_ => 1 } @files;    #uniquenes
 
         for my $parser (keys %parsers) {
 
@@ -53,12 +53,13 @@ has registry => (
     is      => 'ro',
     isa     => 'HashRef',
     default => sub {
+
         # map parsers
         my $parsers = {};
-        my @parsers = @{ shift->parsers };
+        my @parsers = @{shift->parsers};
         foreach my $parser (@parsers) {
             $parsers->{$parser} = $parser;
-            $parsers->{ lc($parser) } = $parser;
+            $parsers->{lc($parser)} = $parser;
         }
         return $parsers;
     }
@@ -67,7 +68,7 @@ has registry => (
 has records => (
     is      => 'rw',
     isa     => 'HashRef',
-    default => sub {{}}
+    default => sub { {} }
 );
 
 has routes => (
@@ -77,8 +78,8 @@ has routes => (
 );
 
 has scraper => (
-    is      => 'rw',
-    isa     => 'Scrappy'
+    is  => 'rw',
+    isa => 'Scrappy'
 );
 
 sub route {
@@ -86,10 +87,10 @@ sub route {
     my $options = {};
 
     # basic definition
-    ( $options->{route}, $options->{parser} ) = @_ if scalar @_ == 2;
+    ($options->{route}, $options->{parser}) = @_ if scalar @_ == 2;
 
     # odd definition
-    if ( @_ % 2 ) {
+    if (@_ % 2) {
         my $route = shift;
         $options = {@_};
         $options->{route} = $route;
@@ -100,15 +101,15 @@ sub route {
       unless $options->{route} && $options->{parser};
 
     # covert parser from shortcut if used
-    if ( $options->{parser} !~ ref($self) . "::" ) {
+    if ($options->{parser} !~ ref($self) . "::") {
 
         my $parser = $options->{parser};
 
         # make fully-quaified parser name
         $parser = ucfirst $parser;
-        $parser = join( "::", map( ucfirst, split '-', $parser ) )
+        $parser = join("::", map(ucfirst, split '-', $parser))
           if $parser =~ /\-/;
-        $parser = join( "", map( ucfirst, split '_', $parser ) )
+        $parser = join("", map(ucfirst, split '_', $parser))
           if $parser =~ /\_/;
 
         $options->{parser} = ref($self) . "::$parser";
@@ -121,8 +122,8 @@ sub route {
     #    $options->{action} = $action;
     #}
 
-    $self->routes->{ $options->{route} } = $options;
-    delete $self->routes->{ $options->{route} }->{route};
+    $self->routes->{$options->{route}} = $options;
+    delete $self->routes->{$options->{route}}->{route};
 
     return $self;
 }
@@ -130,33 +131,34 @@ sub route {
 sub parse_document {
     my ($self, $url) = @_;
     my $scraper = $self->scraper;
-    
+
     die "Can't parse document without a URL"
-        unless $url;
-    
+      unless $url;
+
     # try to match against route(s)
-    foreach my $route (keys %{ $self->routes }) {
+    foreach my $route (keys %{$self->routes}) {
         my $this = $scraper->page_match($route, $url);
         if ($this) {
-            my  $parser = $self->routes->{$route}->{parser};
+            my $parser = $self->routes->{$route}->{parser};
+
             #my  $action = $self->routes->{$route}->{action};
-            
-            no  warnings 'redefine';
-            no  strict 'refs';
-            my  $module = $parser;
-                $module =~ s/::/\//g;
-                
+
+            no warnings 'redefine';
+            no strict 'refs';
+            my $module = $parser;
+            $module =~ s/::/\//g;
+
             require "$module.pm";
-            
-            my  $new = $parser->new;
-                $new->scraper($scraper);
-                
-                $self->records->{ref($self)} = []
-                    unless defined $self->records->{ref($self)};
-                
-            my  $record = $new->parse($this);
-                push @{$self->records->{ref($self)}}, $record;
-                
+
+            my $new = $parser->new;
+            $new->scraper($scraper);
+
+            $self->records->{ref($self)} = []
+              unless defined $self->records->{ref($self)};
+
+            my $record = $new->parse($this);
+            push @{$self->records->{ref($self)}}, $record;
+
             return $record;
         }
     }
@@ -164,25 +166,25 @@ sub parse_document {
 }
 
 sub spider {
-    my  ($class, $starting_url) = @_;
-    my  $self  = ref $class ? $class : $class->new;
-    
+    my ($class, $starting_url) = @_;
+    my $self = ref $class ? $class : $class->new;
+
     croak("Error, can't execute the spider without a starting url")
-        unless $starting_url;
-    
-    my  $q = $self->scraper->queue;
-        $q->add($starting_url); # starting url
-    
+      unless $starting_url;
+
+    my $q = $self->scraper->queue;
+    $q->add($starting_url);    # starting url
+
     while (my $url = $q->next) {
-        
+
         # parse document data
         $self->scraper->get($url);
         $self->parse_document($url)
-            if $self->scraper->page_loaded
-            && $self->scraper->page_ishtml
-            && $self->scraper->page_status == 200;
-        
-        foreach my $link (@{ $self->scraper->select('a')->data }) {
+          if $self->scraper->page_loaded
+              && $self->scraper->page_ishtml
+              && $self->scraper->page_status == 200;
+
+        foreach my $link (@{$self->scraper->select('a')->data}) {
             $q->add($link->{href});
         }
     }

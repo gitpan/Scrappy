@@ -11,7 +11,7 @@ install_share dist => "share";
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'All Powerful Web Spidering, Scrapering, Crawling Framework',
+  'ABSTRACT' => 'The All Powerful Web Spidering, Scraping, Creeping Crawling Framework',
   'AUTHOR' => 'Al Newkirk <awncorp@cpan.org>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.9111150',
+  'VERSION' => '0.9111180',
   'test' => {
     'TESTS' => 't/*.t'
   }
