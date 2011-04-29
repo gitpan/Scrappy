@@ -1,6 +1,6 @@
 package Scrappy::Action;
 BEGIN {
-  $Scrappy::Action::VERSION = '0.91111901';
+  $Scrappy::Action::VERSION = '0.92111190';
 }
 
 use Moose;
@@ -94,6 +94,7 @@ sub execute {
             
             with 'Scrappy::Action::Help';
             print $self->menu;
+            print "\n";
             exit;
             
         }
@@ -105,6 +106,7 @@ sub execute {
                     
                     with 'Scrappy::Action::Help';
                     print $self->menu;
+                    print "\n";
                     exit;
                 }
             }
@@ -120,17 +122,20 @@ sub execute {
         # is actoin available
         unless ($action) {
             print $self->help($requested_action);
+            print "\n";
             exit;
         }
         
         # run the requested action
         print $self->meta->has_method($action) ?
             $self->$action(@options) : $self->help($requested_action);
+        print "\n";
     }
     else {
         # ... or display the help menu
         with 'Scrappy::Action::Help';
         print $self->menu;
+        print "\n";
     }
 }
 

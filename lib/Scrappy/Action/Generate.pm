@@ -1,6 +1,6 @@
 package Scrappy::Action::Generate;
 BEGIN {
-  $Scrappy::Action::Generate::VERSION = '0.91111901';
+  $Scrappy::Action::Generate::VERSION = '0.92111190';
 }
 
 use   File::Util;
@@ -38,7 +38,7 @@ sub script {
                 if $scraper->debug;
             
             # load session file for persistent storage between executions
-            -f 'session.yml' ?
+            -f '[% script_name %].session' ?
                 $scraper->session->load('[% script_name %].session') :
                 $scraper->session->write('[% script_name %].session');
                 

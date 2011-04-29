@@ -1,6 +1,6 @@
 package Scrappy::Project;
 BEGIN {
-  $Scrappy::Project::VERSION = '0.91111901';
+  $Scrappy::Project::VERSION = '0.92111190';
 }
 
 use File::Find::Rule;

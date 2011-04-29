@@ -1,6 +1,9 @@
+# ABSTRACT: Scrappy Scraper Data Extrator
+# Dist::Zilla: +PodWeaver
+
 package Scrappy::Scraper::Parser;
 BEGIN {
-  $Scrappy::Scraper::Parser::VERSION = '0.91111901';
+  $Scrappy::Scraper::Parser::VERSION = '0.92111190';
 }
 
 # load OO System
@@ -156,31 +159,34 @@ has 'html_tags' => (
     }
 );
 
+
 sub focus {
     my $self = shift;
     my $index = shift || 0;
 
-    $self->is_html;
+    $self->has_html;
 
     $self->html($self->data->[$index]->{html});
     return $self;
 }
 
+
 sub scrape {
     my ($self, $selector, $html) = @_;
 
     $self->html($html) if $html;
-    $self->is_html;
+    $self->has_html;
 
     $self->select($selector);
     return $self->data;
 }
 
+
 sub select {
     my ($self, $selector, $html) = @_;
 
     $self->html($html) if $html;
-    $self->is_html;
+    $self->has_html;
 
     $self->worker->{code} = scraper {
         process($selector, "data[]", $self->html_tags);
@@ -192,10 +198,144 @@ sub select {
     return $self;
 }
 
-sub is_html {
+
+sub has_html {
     my $self = shift;
     croak("Can't parse HTML document without providing a valid source")
       unless $self->html;
 }
 
 1;
+
+__END__
+=pod
+
+=head1 NAME
+
+Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
+
+=head1 VERSION
+
+version 0.92111190
+
+=head1 SYNOPSIS
+
+    #!/usr/bin/perl
+    use Scrappy::Scraper::Parser;
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->html($html);
+        
+        # get all links in all table rows with CSS selector
+        my  $links = $parser->scrape('table tr a');
+        
+        # select all links in the 2nd table row of all tables with XPATH selector
+        my  $links = $parser->scrape('//table/tr[2]/a');
+        
+        # percision scraping !
+        # select all links in the 2nd table row ONLY with CSS selectors and focus()
+        my  $links = 
+            $parser->select('table tr')
+               ->focus(2)
+               ->scrape('a');
+
+=head1 DESCRIPTION
+
+Scrappy::Scraper::Parser provides various tools for scraping/extracting information
+from web pages using the L<Scrappy> framework.
+
+=head2 ATTRIBUTES
+
+The following is a list of object attributes available with every Scrappy::Scraper::Parser
+instance.
+
+=head3 data
+
+The data attribute gets/sets the extracted data which is returned from the scrape
+method.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('table tr');
+        $parser->data;
+
+=head3 html
+
+The html attribute gets/sets the HTML content to be parsed and extracted from.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->html($HTML);
+
+=head3 html_tags
+
+The html_tags attribute gets a hashref of all known HTML tags and attributes to
+be used with L<Web::Scraper>.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->html_tags;
+
+=head3 worker
+
+The worker attribute holds the L<Web::Scraper> object which is used to parse HTML
+and extract data.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->worker;
+
+=head1 METHODS
+
+=head2 focus
+
+The focus method is used zero-in on specific blocks of HTML so the selectors only
+extract data from within the highlighted block. The focus method is meant to be
+used after the select method extracts rows of data, the focus method is passed an
+array index which zeros-in on that row of data.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+    
+    # percision scraping !
+    # select all links in the 2nd table row ONLY
+    my  $links = 
+        $parser->select('table tr')
+           ->focus(2)
+           ->scrape('a');
+
+=head2 scrape
+
+The scrape method is used to extract data from the specified HTML and return the
+extracted data. This method is dentical to the select method with the exception of
+what is returned.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+    my  $links = $parser->scrape('a', $from_html); #get all links
+
+=head2 select
+
+The select method is used to extract data from the specified HTML and return the
+parser object. The data method can be used to access the extracted information.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('a', $from_html); #get all links
+        
+    my  $links = $parser->data;
+
+=head2 has_html
+
+The has_html method return a boolean which determine whether HTML content has
+been set.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        print 'oh no' unless $parser->has_html;
+
+=head1 AUTHOR
+
+Al Newkirk <awncorp@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by awncorp.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+
