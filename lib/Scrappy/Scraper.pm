@@ -1,7 +1,6 @@
 package Scrappy::Scraper;
-
 BEGIN {
-    $Scrappy::Scraper::VERSION = '0.9111180';
+  $Scrappy::Scraper::VERSION = '0.9111190';
 }
 
 # load OO System
@@ -366,7 +365,7 @@ sub page_data {
     if ($data) {
         $self->worker->update_html($data);
     }
-
+    
     return $self->worker->content(@args);
 }
 
@@ -383,12 +382,12 @@ sub page_loaded {
 }
 
 sub page_match {
-    my $self    = shift;
-    my $pattern = shift;
-    my $url     = shift || $self->url;
-    $url = URI->new($url);
-    my $options = shift || {};
-
+    my  $self    = shift;
+    my  $pattern = shift;
+    my  $url     = shift || $self->url;
+        $url     = URI->new($url);
+    my  $options = shift || {};
+    
     croak("route can't be defined without a valid URL pattern")
       unless $pattern;
 
@@ -476,7 +475,7 @@ sub page_match {
         }
         $match->{params} = {%args};
         $match->{params}->{splat} = \@splat if @splat;
-
+        
         return $match;
     }
 

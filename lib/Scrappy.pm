@@ -2,9 +2,8 @@
 # Dist::Zilla: +PodWeaver
 
 package Scrappy;
-
 BEGIN {
-    $Scrappy::VERSION = '0.9111180';
+  $Scrappy::VERSION = '0.9111190';
 }
 
 # load OO System
@@ -48,15 +47,42 @@ sub crawl {
             }
         }
     }
-
+    
     return $self;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 1;
 
 __END__
-
 =pod
 
 =head1 NAME
@@ -65,7 +91,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.9111180
+version 0.9111190
 
 =head1 SYNOPSIS
 

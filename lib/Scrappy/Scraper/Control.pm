@@ -1,10 +1,9 @@
-# ABSTRACT: Scrappy Request Constraints System
+# ABSTRACT: Scrappy HTTP Request Constraints System
 # Dist::Zilla: +PodWeaver
 
 package Scrappy::Scraper::Control;
-
 BEGIN {
-    $Scrappy::Scraper::Control::VERSION = '0.9111180';
+  $Scrappy::Scraper::Control::VERSION = '0.9111190';
 }
 
 # load OO System
@@ -13,23 +12,20 @@ use Moose;
 # load other libraries
 use URI;
 
-has 'allowed' => (is => 'rw', isa => 'HashRef', default => sub { {} });
-has 'options' => (
-    is        => 'ro',
-    isa       => 'HashRef',
-    'default' => sub { {methods => [qw/GET PUT PUSH DELETE POST/]} }
-);
+has 'allowed'    => (is => 'rw', isa => 'HashRef', default => sub { {} });
+has 'options'    => (is => 'ro', isa => 'HashRef',
+    'default'    => sub { { methods => [qw/GET PUT PUSH DELETE POST/] } });
 has 'restricted' => (is => 'rw', isa => 'HashRef', default => sub { {} });
 
 
 sub allow {
-    my ($self, @domains) = @_;
-    my $i = 0;
-
+    my  ($self, @domains) = @_;
+    my  $i = 0;
+    
     for (@domains) {
-
-        $_ = URI->new($_)->host if $_ =~ /\:\/\//;    # url to domain
-
+        
+        $_ = URI->new($_)->host if $_ =~ /\:\/\//; # url to domain
+        
         next unless $_;
         delete $self->restricted->{$_} if defined $self->restricted->{$_};
         $self->allowed->{$_} = $self->options;
@@ -40,12 +36,12 @@ sub allow {
 
 
 sub restrict {
-    my ($self, @domains) = @_;
-    my $i = 0;
+    my  ($self, @domains) = @_;
+    my  $i = 0;
     for (@domains) {
-
-        $_ = URI->new($_)->host if $_ =~ /\:\/\//;    # url to domain
-
+        
+        $_ = URI->new($_)->host if $_ =~ /\:\/\//; # url to domain
+        
         next unless $_;
         delete $self->allowed->{$_} if defined $self->allowed->{$_};
         $self->restricted->{$_} = $self->options;
@@ -56,10 +52,10 @@ sub restrict {
 
 
 sub is_allowed {
-    my $self = shift;
-    my $url  = shift;
-    $url = URI->new($url)->host if $url =~ /\:\/\//;    # url to domain
-    my %options = @_;
+    my  $self = shift;
+    my  $url = shift;
+        $url = URI->new($url)->host if $url =~ /\:\/\//; # url to domain
+    my  %options = @_;
 
     # empty domain not allowed
     return 0 unless $url;
@@ -86,16 +82,15 @@ sub is_allowed {
 1;
 
 __END__
-
 =pod
 
 =head1 NAME
 
-Scrappy::Scraper::Control - Scrappy Request Constraints System
+Scrappy::Scraper::Control - Scrappy HTTP Request Constraints System
 
 =head1 VERSION
 
-version 0.9111180
+version 0.9111190
 
 =head1 SYNOPSIS
 

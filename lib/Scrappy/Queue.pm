@@ -1,7 +1,6 @@
 package Scrappy::Queue;
-
 BEGIN {
-    $Scrappy::Queue::VERSION = '0.9111180';
+  $Scrappy::Queue::VERSION = '0.9111190';
 }
 
 # load OO System
@@ -27,6 +26,7 @@ sub add {
     # validate and formulate proper URLs
     for (my $i = 0; $i < @urls; $i++) {
         my $u = URI->new($urls[$i]);
+        
         if ('URI::_generic' ne ref $u) {
             $urls[$i] = $u->as_string;
         }
