@@ -2,9 +2,8 @@
 # Dist::Zilla: +PodWeaver
 
 package Scrappy::Queue;
-
 BEGIN {
-    $Scrappy::Queue::VERSION = '0.921111901';
+  $Scrappy::Queue::VERSION = '0.921111901';
 }
 
 # load OO System
@@ -88,6 +87,7 @@ sub previous {
 }
 
 
+
 sub first {
     my $self = shift;
     $_cursor = 0;
@@ -119,7 +119,6 @@ sub cursor {
 1;
 
 __END__
-
 =pod
 
 =head1 NAME

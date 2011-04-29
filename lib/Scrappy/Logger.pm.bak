@@ -2,9 +2,8 @@
 # Dist::Zilla: +PodWeaver
 
 package Scrappy::Logger;
-
 BEGIN {
-    $Scrappy::Logger::VERSION = '0.921111901';
+  $Scrappy::Logger::VERSION = '0.921111901';
 }
 
 # load OO System
@@ -142,7 +141,6 @@ sub write {
 1;
 
 __END__
-
 =pod
 
 =head1 NAME

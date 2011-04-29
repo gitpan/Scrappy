@@ -4,7 +4,7 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 use File::ShareDir::Install;
 install_share dist => "share";
@@ -15,7 +15,7 @@ my %WriteMakefileArgs = (
   'AUTHOR' => 'Al Newkirk <awncorp@cpan.org>',
   'BUILD_REQUIRES' => {},
   'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31',
+    'ExtUtils::MakeMaker' => '6.30',
     'File::ShareDir::Install' => '0.03'
   },
   'DISTNAME' => 'Scrappy',
@@ -44,7 +44,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.92111190',
+  'VERSION' => '0.921111901',
   'test' => {
     'TESTS' => 't/*.t'
   }

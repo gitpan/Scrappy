@@ -2,9 +2,8 @@
 # Dist::Zilla: +PodWeaver
 
 package Scrappy::Scraper::Control;
-
 BEGIN {
-    $Scrappy::Scraper::Control::VERSION = '0.921111901';
+  $Scrappy::Scraper::Control::VERSION = '0.921111901';
 }
 
 # load OO System
@@ -86,7 +85,6 @@ sub is_allowed {
 1;
 
 __END__
-
 =pod
 
 =head1 NAME
