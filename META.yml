@@ -32,4 +32,4 @@ requires:
   WWW::Mechanize: 0
   Web::Scraper: 0
   YAML::Syck: 0
-version: 0.9111190
+version: 0.91111901

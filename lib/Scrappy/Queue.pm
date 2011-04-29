@@ -1,6 +1,6 @@
 package Scrappy::Queue;
 BEGIN {
-  $Scrappy::Queue::VERSION = '0.9111190';
+  $Scrappy::Queue::VERSION = '0.91111901';
 }
 
 # load OO System

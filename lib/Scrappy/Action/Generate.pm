@@ -1,6 +1,6 @@
 package Scrappy::Action::Generate;
 BEGIN {
-  $Scrappy::Action::Generate::VERSION = '0.9111190';
+  $Scrappy::Action::Generate::VERSION = '0.91111901';
 }
 
 use   File::Util;
@@ -34,13 +34,13 @@ sub script {
             $scraper->logger->verbose(0);
             
             # create a new log file with each execution
-            $scraper->logger->write($script_name . "_logs/$datetime.yml")
+            $scraper->logger->write("[% script_name %]_logs/$datetime.yml")
                 if $scraper->debug;
             
             # load session file for persistent storage between executions
             -f 'session.yml' ?
-                $scraper->session->load($script_name . '.session') :
-                $scraper->session->write($script_name . '.session');
+                $scraper->session->load('[% script_name %].session') :
+                $scraper->session->write('[% script_name %].session');
                 
             # crawl something ...
             $scraper->crawl('http://localhost/',

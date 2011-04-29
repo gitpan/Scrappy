@@ -3,7 +3,7 @@
 
 package Scrappy::Scraper::Control;
 BEGIN {
-  $Scrappy::Scraper::Control::VERSION = '0.9111190';
+  $Scrappy::Scraper::Control::VERSION = '0.91111901';
 }
 
 # load OO System
@@ -90,7 +90,7 @@ Scrappy::Scraper::Control - Scrappy HTTP Request Constraints System
 
 =head1 VERSION
 
-version 0.9111190
+version 0.91111901
 
 =head1 SYNOPSIS
 
