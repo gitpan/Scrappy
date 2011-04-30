@@ -4,7 +4,7 @@
 package Scrappy::Session;
 
 BEGIN {
-    $Scrappy::Session::VERSION = '0.921111901';
+    $Scrappy::Session::VERSION = '0.93111200';
 }
 
 # load OO System
@@ -15,7 +15,7 @@ use Carp;
 use YAML::Syck;
 $YAML::Syck::ImplicitTyping = 1;
 
-has 'file' => (is => 'ro', isa => 'Str');
+has 'file' => (is => 'rw', isa => 'Str');
 
 
 sub load {
@@ -74,10 +74,11 @@ sub write {
     if ($file) {
 
         # write session file
+        DumpFile($file, $self->{stash});
+
+        # ... ummm
         croak("Session file $file does not exist or is not read/writable")
           unless -f $file;
-
-        DumpFile($file, $self->{stash});
     }
 
     return $self->{stash};
@@ -95,7 +96,7 @@ Scrappy::Session - Scrappy Scraper Session Handling
 
 =head1 VERSION
 
-version 0.921111901
+version 0.93111200
 
 =head1 SYNOPSIS
 

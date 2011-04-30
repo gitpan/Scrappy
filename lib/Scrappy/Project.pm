@@ -1,9 +1,10 @@
 package Scrappy::Project;
 
 BEGIN {
-    $Scrappy::Project::VERSION = '0.921111901';
+    $Scrappy::Project::VERSION = '0.93111200';
 }
 
+use Carp;
 use File::Find::Rule;
 use Scrappy;
 use Moose::Role;
@@ -133,8 +134,9 @@ sub parse_document {
     my ($self, $url) = @_;
     my $scraper = $self->scraper;
 
-    die "Can't parse document without a URL"
-      unless $url;
+    croak("Unable to fetch document, URL is not defined") unless $url;
+    croak("Can't parse document, No routes defined")
+      unless keys %{$self->routes};
 
     # try to match against route(s)
     foreach my $route (keys %{$self->routes}) {
@@ -155,27 +157,27 @@ sub parse_document {
             my $new = $parser->new;
             $new->scraper($scraper);
 
-            $self->records->{ref($self)} = []
-              unless defined $self->records->{ref($self)};
+            $self->records->{$route} = []
+              unless defined $self->records->{$route};
 
             my $record = $new->parse($this);
-            push @{$self->records->{ref($self)}}, $record;
+            push @{$self->records->{$route}}, $record;
 
             return $record;
         }
     }
+
     return 0;
 }
 
-sub spider {
+sub crawl {
     my ($class, $starting_url) = @_;
     my $self = ref $class ? $class : $class->new;
 
-    croak("Error, can't execute the spider without a starting url")
-      unless $starting_url;
+    croak("Error, can't execute without a starting url") unless $starting_url;
 
     my $q = $self->scraper->queue;
-    $q->add($starting_url);    # starting url
+    $q->add($starting_url);
 
     while (my $url = $q->next) {
 
@@ -185,11 +187,9 @@ sub spider {
           if $self->scraper->page_loaded
               && $self->scraper->page_ishtml
               && $self->scraper->page_status == 200;
-
-        foreach my $link (@{$self->scraper->select('a')->data}) {
-            $q->add($link->{href});
-        }
     }
+
+    return $self->records;
 }
 
 1;

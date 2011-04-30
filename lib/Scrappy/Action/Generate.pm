@@ -1,7 +1,7 @@
 package Scrappy::Action::Generate;
 
 BEGIN {
-    $Scrappy::Action::Generate::VERSION = '0.921111901';
+    $Scrappy::Action::Generate::VERSION = '0.93111200';
 }
 
 use File::Util;
@@ -35,13 +35,13 @@ sub script {
             $scraper->logger->verbose(0);
             
             # create a new log file with each execution
-            $scraper->logger->write("[% script_name %]_logs/$datetime.yml")
+            $scraper->logger->write("[% script_name %]_logs/$datetime.log")
                 if $scraper->debug;
             
             # load session file for persistent storage between executions
-            -f '[% script_name %].session' ?
-                $scraper->session->load('[% script_name %].session') :
-                $scraper->session->write('[% script_name %].session');
+            -f '[% script_name %].sess' ?
+                $scraper->session->load('[% script_name %].sess') :
+                $scraper->session->write('[% script_name %].sess');
                 
             # crawl something ...
             $scraper->crawl('http://localhost/',
@@ -59,14 +59,46 @@ sub script {
     return "\n... successfully created script $script_name.pl\n";
 }
 
+sub class {
+    my ($self, @options) = @_;
+
+    my $project = $options[0] || "MyApp";
+    my $path = $project;
+    $path =~ s/::/\//g;
+
+    File::Util->new->write_file(
+        'file'    => "lib/$path.pm",
+        'bitmask' => 644,
+        'content' => strip tt q{
+        package [% project %];
+
+        use Moose;
+        with 'Scrappy::Project::Document';
+        
+        sub title {
+            return
+                shift->scraper->select('title')
+                ->data->[0]->{text};
+        }
+        
+        1;
+    }
+    );
+
+    return "\n... successfully created project class $project\n";
+}
+
 sub project {
     my ($self, @options) = @_;
 
     my $project = $options[0] || "MyApp";
-    my $object = lc $project;
+    my $object = $project;
+    $object =~ s/::/\-/g;
+    my $path = $project;
+    $path =~ s/::/\//g;
 
     File::Util->new->write_file(
-        'file'    => "$project/$object",
+        'file'    => "$object/" . lc $object,
         'bitmask' => 644,
         'content' => strip tt q{
         #!/usr/bin/perl
@@ -76,12 +108,14 @@ sub project {
         use lib 'lib';
         use [% project %];
         
-        [% project %]->spider('http://www.[% object %].com/') ; # ... and away we go ...
+        my  $starting_url = '...';
+        
+        [% project %]->crawl($starting_url) ; # ... and away we go ...
     }
     );
 
     File::Util->new->write_file(
-        'file'    => "$project/lib/$project.pm",
+        'file'    => "$object/lib/$path.pm",
         'bitmask' => 644,
         'content' => strip tt q{
         package [% project %];
@@ -92,8 +126,8 @@ sub project {
         
         sub setup {
             
-            my  $[% object %] = shift;
-            my  $scraper  = $[% object %]->scraper;
+            my  $self     = shift;
+            my  $scraper  = $self->scraper;
             my  $datetime = $scraper->logger->timestamp;
                 $datetime =~ s/\D//g;
                 
@@ -104,19 +138,19 @@ sub project {
                 $scraper->logger->verbose(0);
                 
                 # create a new log file with each execution
-                $scraper->logger->write("logs/$datetime.yml")
+                $scraper->logger->write("logs/$datetime.log")
                     if $scraper->debug;
                 
                 # load session file for persistent storage between executions
-                -f 'session.yml' ?
-                    $scraper->session->load('session.yml') :
-                    $scraper->session->write('session.yml');
+                -f '[% object FILTER lower %].sess' ?
+                    $scraper->session->load('[% object FILTER lower %].sess') :
+                    $scraper->session->write('[% object FILTER lower %].sess');
                     
                 # define route(s) - route web pages to parsers
-                $[% object %]->route('/' => 'page');
+                $self->route('/' => 'root');
                 
                 # return your configured app instance
-                $[% object %];
+                $self;
         
         }
         
@@ -125,13 +159,57 @@ sub project {
     );
 
     File::Util->new->write_file(
-        'file'    => "$project/lib/$project/Page.pm",
+        'file'    => "$object/lib/$path/Root.pm",
+        'bitmask' => 644,
+        'content' => strip tt q{
+        package [% project %]::Root;
+
+        use Moose;
+        with 'Scrappy::Project::Document';
+        
+        # ... maybe for parsing /index.html
+        
+        sub title {
+            return
+                shift->scraper->select('title')
+                ->data->[0]->{text};
+        }
+        
+        1;
+    }
+    );
+
+    File::Util->new->write_file(
+        'file'    => "$object/lib/$path/List.pm",
+        'bitmask' => 644,
+        'content' => strip tt q{
+        package [% project %]::List;
+
+        use Moose;
+        with 'Scrappy::Project::Document';
+        
+        # ... maybe for parsing /search.html
+        
+        sub title {
+            return
+                shift->scraper->select('title')
+                ->data->[0]->{text};
+        }
+        
+        1;
+    }
+    );
+
+    File::Util->new->write_file(
+        'file'    => "$object/lib/$path/Page.pm",
         'bitmask' => 644,
         'content' => strip tt q{
         package [% project %]::Page;
 
         use Moose;
         with 'Scrappy::Project::Document';
+        
+        # ... maybe for parsing /:page.html
         
         sub title {
             return
@@ -162,3 +240,8 @@ EXAMPLE: scrappy generate script eg/web_crawler.pl
 
 USAGE: scrappy generate project [PACKAGE]
 EXAMPLE: scrappy generate project MyApp
+
+* Generate a Scrappy project class
+
+USAGE: scrappy generate class [CLASS]
+EXAMPLE: scrappy generate class MyApp::SearchPage

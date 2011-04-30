@@ -4,7 +4,7 @@
 package Scrappy::Scraper::Parser;
 
 BEGIN {
-    $Scrappy::Scraper::Parser::VERSION = '0.921111901';
+    $Scrappy::Scraper::Parser::VERSION = '0.93111200';
 }
 
 # load OO System
@@ -161,6 +161,57 @@ has 'html_tags' => (
 );
 
 
+sub filter {
+    my ($self, @filters) = @_;
+
+    # remove filter list
+    if (@filters) {
+
+        # remove all except for specified attributes
+        $self->data(
+            [   map {
+                    my $record  = $_;
+                    my $changes = {};
+                    foreach my $filter (@filters) {
+
+                        #if ('HASH' eq ref $filter) {
+                        #    my ($tag, $value) = each(%{$filter});
+                        #    $changes->{$filter} = $record->{$filter}
+                        #        if $record->{$filter}
+                        #        && $record->{$filter} eq $value
+                        #        && $filter eq $tag;
+                        #}
+                        #else {
+                        $changes->{$filter} = $record->{$filter}
+                          if $record->{$filter};
+
+                        #}
+                    }
+                    $changes;
+                  } @{$self->data}
+            ]
+        );
+    }
+
+    # remove all empty attributes
+    $self->data(
+        [   map {
+                my $record = $_;
+                foreach my $tag (keys %{$record}) {
+                    delete $record->{$tag}
+                      if !$record->{$tag}
+                          && $tag ne 'html'
+                          && $tag ne 'text';
+                }
+                $record;
+              } @{$self->data}
+        ]
+    );
+
+    return $self;
+}
+
+
 sub focus {
     my $self = shift;
     my $index = shift || 0;
@@ -196,6 +247,7 @@ sub select {
     my $scraper = $self->worker->{code};
 
     $self->data($scraper->scrape($self->html)->{data} || []);
+    $self->filter;
     return $self;
 }
 
@@ -218,7 +270,7 @@ Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
 
 =head1 VERSION
 
-version 0.921111901
+version 0.93111200
 
 =head1 SYNOPSIS
 
@@ -284,6 +336,38 @@ and extract data.
         $parser->worker;
 
 =head1 METHODS
+
+=head2 filter
+
+The filter method allows you to filter the tags returned within the results by
+supplying the filter method with a list of tag attributes that you specifically
+want to return, forsaking all others, including the special text and html
+tags/keys.
+
+    # filter results and only return meta tags with a content attribute
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('meta');
+        print $parser->data;
+        
+        ...
+        
+        {
+            name => '...',
+            text => '...',
+            html => '...',
+            content => '....',
+            http => '...',
+            ....
+        }
+        
+        print $parser->filter('name', 'content')->data;
+        
+        ...
+        
+        {
+            name => '...',
+            content => '....',
+        }
 
 =head2 focus
 
