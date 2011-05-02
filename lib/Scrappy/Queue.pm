@@ -4,7 +4,7 @@
 package Scrappy::Queue;
 
 BEGIN {
-    $Scrappy::Queue::VERSION = '0.93111200';
+    $Scrappy::Queue::VERSION = '0.92111220';
 }
 
 # load OO System
@@ -128,7 +128,7 @@ Scrappy::Queue - Scrappy HTTP Request Flow-Control System
 
 =head1 VERSION
 
-version 0.93111200
+version 0.92111220
 
 =head1 SYNOPSIS
 

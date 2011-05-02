@@ -4,7 +4,7 @@
 package Scrappy::Scraper::Parser;
 
 BEGIN {
-    $Scrappy::Scraper::Parser::VERSION = '0.93111200';
+    $Scrappy::Scraper::Parser::VERSION = '0.92111220';
 }
 
 # load OO System
@@ -270,7 +270,7 @@ Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
 
 =head1 VERSION
 
-version 0.93111200
+version 0.92111220
 
 =head1 SYNOPSIS
 
