@@ -1,7 +1,7 @@
 package Scrappy::Plugin::RandomProxy;
 
 BEGIN {
-    $Scrappy::Plugin::RandomProxy::VERSION = '0.92111220';
+    $Scrappy::Plugin::RandomProxy::VERSION = '0.92111230';
 }
 
 use Moose::Role;

@@ -4,7 +4,7 @@
 package Scrappy::Session;
 
 BEGIN {
-    $Scrappy::Session::VERSION = '0.92111220';
+    $Scrappy::Session::VERSION = '0.92111230';
 }
 
 # load OO System
@@ -15,6 +15,7 @@ use Carp;
 use YAML::Syck;
 $YAML::Syck::ImplicitTyping = 1;
 
+has 'auto_save' => (is => 'rw', isa => 'Bool', default => 1);
 has 'file' => (is => 'rw', isa => 'Str');
 
 
@@ -60,7 +61,7 @@ sub stash {
         }
     }
 
-    $self->write;
+    $self->auto_write;
     return $self->{stash};
 }
 
@@ -84,6 +85,13 @@ sub write {
     return $self->{stash};
 }
 
+sub auto_write {
+    my $self = shift;
+    $self->write if $self->auto_save;
+
+    return $self;
+}
+
 1;
 
 __END__
@@ -96,7 +104,7 @@ Scrappy::Session - Scrappy Scraper Session Handling
 
 =head1 VERSION
 
-version 0.92111220
+version 0.92111230
 
 =head1 SYNOPSIS
 
@@ -121,6 +129,21 @@ data across multiple execution using the L<Scrappy> framework.
 
 The following is a list of object attributes available with every Scrappy::Session
 instance.
+
+=head3 auto_save
+
+The auto_save attribute is a boolean that determines whether stash data is
+automatically saved to the session file on update.
+
+    my  $session = Scrappy::Session->new;
+        
+        $session->load('scraper.sess');
+        $session->stash('foo' => 'bar');
+        
+        # turn auto-saving off
+        $session->auto_save(0);
+        $session->stash('foo' => 'bar');
+        $session->write; # explicit write
 
 =head3 file
 

@@ -4,7 +4,7 @@
 package Scrappy;
 
 BEGIN {
-    $Scrappy::VERSION = '0.92111220';
+    $Scrappy::VERSION = '0.92111230';
 }
 
 # load OO System
@@ -65,7 +65,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.92111220
+version 0.92111230
 
 =head1 SYNOPSIS
 

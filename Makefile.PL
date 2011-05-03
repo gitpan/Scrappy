@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.92111220',
+  'VERSION' => '0.92111230',
   'test' => {
     'TESTS' => 't/*.t'
   }
