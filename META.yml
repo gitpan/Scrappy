@@ -33,4 +33,4 @@ requires:
   WWW::Mechanize: 0
   Web::Scraper: 0
   YAML::Syck: 0
-version: 0.92111230
+version: 0.93111250

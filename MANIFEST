@@ -1,3 +1,4 @@
+Changes
 LICENSE
 MANIFEST
 META.yml
@@ -9,6 +10,7 @@ lib/Scrappy.pm
 lib/Scrappy.pm.bak
 lib/Scrappy/Action.pm
 lib/Scrappy/Action.pm.bak
+lib/Scrappy/Action/Download.pm
 lib/Scrappy/Action/Generate.pm
 lib/Scrappy/Action/Generate.pm.bak
 lib/Scrappy/Action/Help.pm

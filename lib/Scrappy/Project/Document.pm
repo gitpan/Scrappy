@@ -1,7 +1,7 @@
 package Scrappy::Project::Document;
 
 BEGIN {
-    $Scrappy::Project::Document::VERSION = '0.92111230';
+    $Scrappy::Project::Document::VERSION = '0.93111250';
 }
 
 use Moose::Role;

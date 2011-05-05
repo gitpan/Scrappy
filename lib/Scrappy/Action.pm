@@ -1,7 +1,7 @@
 package Scrappy::Action;
 
 BEGIN {
-    $Scrappy::Action::VERSION = '0.92111230';
+    $Scrappy::Action::VERSION = '0.93111250';
 }
 
 use Moose;

@@ -4,7 +4,7 @@
 package Scrappy;
 
 BEGIN {
-    $Scrappy::VERSION = '0.92111230';
+    $Scrappy::VERSION = '0.93111250';
 }
 
 # load OO System
@@ -34,15 +34,16 @@ sub crawl {
             if ($data) {
 
                 # found a page match, fetch and scrape the page for data
-                $self->get($url);
+                if ($self->get($url)->page_loaded) {
 
-                foreach my $selector (keys %{$pages{$page}}) {
+                    foreach my $selector (keys(%{$pages{$page}})) {
 
-                    # loop through resultset
-                    foreach my $item (@{$self->select($selector)->data}) {
+                        # loop through resultset
+                        foreach my $item (@{$self->select($selector)->data}) {
 
-                        # execute selector code
-                        $pages{$page}->{$selector}->($self, $item, $data);
+                            # execute selector code
+                            $pages{$page}->{$selector}->($self, $item, $data);
+                        }
                     }
                 }
             }
@@ -65,7 +66,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.92111230
+version 0.93111250
 
 =head1 SYNOPSIS
 
@@ -336,11 +337,16 @@ The form method is used to submit a form on the current page.
 
 =head2 get
 
-The get method takes a URL or URI object, fetches a web page and returns an
-HTTP::Response object.
+The get method takes a URL or URI object, fetches a web page and returns the
+Scrappy object.
 
     my  $scraper = Scrappy->new;
-    my  $response = $scraper->get($new_url);
+    
+    if ($scraper->get($new_url)->page_loaded) {
+        ...
+    }
+    
+    # $self->content has the HTTP::Response object
 
 =head2 log
 

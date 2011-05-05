@@ -1,7 +1,7 @@
 package Scrappy::Action::Generate;
 
 BEGIN {
-    $Scrappy::Action::Generate::VERSION = '0.92111230';
+    $Scrappy::Action::Generate::VERSION = '0.93111250';
 }
 
 use File::Util;
