@@ -1,13 +1,14 @@
 package Scrappy::Scraper;
 
 BEGIN {
-    $Scrappy::Scraper::VERSION = '0.93111250';
+    $Scrappy::Scraper::VERSION = '0.94111260';
 }
 
 # load OO System
 use Moose;
 
 # load other libraries
+use Data::Dumper;
 use File::Util;
 use Scrappy::Logger;
 use Scrappy::Plugin;
@@ -260,6 +261,11 @@ sub download {
     sleep $self->pause;
 
     return $self;
+}
+
+sub dumper {
+    shift;
+    return Data::Dumper::Dumper(@_);
 }
 
 sub form {

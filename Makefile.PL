@@ -27,6 +27,7 @@ my %WriteMakefileArgs = (
   'PREREQ_PM' => {
     'Array::Unique' => '0',
     'Cwd' => '0',
+    'Data::Dumper' => '0',
     'DateTime' => '0',
     'DateTime::Format::SQLite' => '0',
     'File::Find::Rule' => '0',
@@ -45,7 +46,7 @@ my %WriteMakefileArgs = (
     'Web::Scraper' => '0',
     'YAML::Syck' => '0'
   },
-  'VERSION' => '0.93111250',
+  'VERSION' => '0.94111260',
   'test' => {
     'TESTS' => 't/*.t'
   }

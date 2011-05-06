@@ -4,7 +4,7 @@
 package Scrappy;
 
 BEGIN {
-    $Scrappy::VERSION = '0.93111250';
+    $Scrappy::VERSION = '0.94111260';
 }
 
 # load OO System
@@ -66,7 +66,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.93111250
+version 0.94111260
 
 =head1 SYNOPSIS
 
@@ -311,6 +311,22 @@ the originating page.
     
         # supply your own file name
         $scraper->download($requested_url, '/tmp', 'somefile.txt');
+
+=head2 dumper
+
+The dumper method is a convenience feature that passes the passed-in objects to
+L<Data::Dumper> which in turn returns a stringified representation of that
+object/data-structure.
+
+    my  $scaper = Scrappy->new;
+    my  $requested_url = '...';
+    
+        $scraper->get($requested_url);
+    
+    my  $data = $scraper->select('//a[@href]')->data;
+    
+    # print out the scraped data
+    print $scraper->dumper($data);
 
 =head2 form
 

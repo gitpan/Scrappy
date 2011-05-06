@@ -1,7 +1,7 @@
 package Scrappy::Action::Download;
 
 BEGIN {
-    $Scrappy::Action::Download::VERSION = '0.93111250';
+    $Scrappy::Action::Download::VERSION = '0.94111260';
 }
 
 use URI;

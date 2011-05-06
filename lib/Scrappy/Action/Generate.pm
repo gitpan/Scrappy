@@ -1,7 +1,7 @@
 package Scrappy::Action::Generate;
 
 BEGIN {
-    $Scrappy::Action::Generate::VERSION = '0.93111250';
+    $Scrappy::Action::Generate::VERSION = '0.94111260';
 }
 
 use File::Util;
@@ -12,8 +12,13 @@ with 'Scrappy::Action::Help';
 sub script {
     my ($self, @options) = @_;
     my $script_name = $options[0] || "myapp.pl";
+
+    return "\nThe specified file already exists\n"
+      if -f $script_name;
+
     $script_name =~ s/\.pl$//;
 
+    File::Util->new->make_dir(join("_", $script_name, "logs"));
     File::Util->new->write_file(
         'file'    => "$script_name.pl",
         'bitmask' => 644,
@@ -63,11 +68,17 @@ sub class {
     my ($self, @options) = @_;
 
     my $project = $options[0] || "MyApp";
+
+    return "\nPlease use a properly formatted class name\n"
+      if $project =~ /[^a-zA-Z0-9\:]/;
+
+    my $object = $project;
+    $object =~ s/::/\-/g;
     my $path = $project;
     $path =~ s/::/\//g;
 
     File::Util->new->write_file(
-        'file'    => "lib/$path.pm",
+        'file' => -d $object ? "$object/lib/$path.pm" : "lib/$path.pm",
         'bitmask' => 644,
         'content' => strip tt q{
         package [% project %];
@@ -92,11 +103,16 @@ sub project {
     my ($self, @options) = @_;
 
     my $project = $options[0] || "MyApp";
+
+    return "\nPlease use a properly formatted class name\n"
+      if $project =~ /[^a-zA-Z0-9\:]/;
+
     my $object = $project;
     $object =~ s/::/\-/g;
     my $path = $project;
     $path =~ s/::/\//g;
 
+    File::Util->new->make_dir('logs');
     File::Util->new->write_file(
         'file'    => "$object/" . lc $object,
         'bitmask' => 644,
@@ -108,9 +124,37 @@ sub project {
         use lib 'lib';
         use [% project %];
         
-        my  $starting_url = '...';
+        my  $project = [% project %]->new;
+        my  $scraper  = $project->scraper;
         
-        [% project %]->crawl($starting_url) ; # ... and away we go ...
+        my  $datetime = $scraper->logger->timestamp;
+            $datetime =~ s/\D//g;
+            
+            # report warning, errors and other information
+            $scraper->debug(0);
+            
+            # report detailed event logs
+            $scraper->logger->verbose(0);
+            
+            # create a new log file with each execution
+            $scraper->logger->write("logs/$datetime.log")
+                if $scraper->debug;
+            
+            # load session file for persistent storage between executions
+            -f '[% object FILTER lower %].sess' ?
+                $scraper->session->load('[% object FILTER lower %].sess') :
+                $scraper->session->write('[% object FILTER lower %].sess');
+        
+        my  $url = 'http://search.cpan.org/';
+    
+        if ($scraper->get($url)->page_loaded) {
+            
+            # testing testing 1 .. 2 .. 3
+            my  $data = $project->parse_document($url);
+            print $scraper->dumper($data);
+            
+        }
+    
     }
     );
 
@@ -126,31 +170,14 @@ sub project {
         
         sub setup {
             
-            my  $self     = shift;
-            my  $scraper  = $self->scraper;
-            my  $datetime = $scraper->logger->timestamp;
-                $datetime =~ s/\D//g;
-                
-                # report warning, errors and other information
-                $scraper->debug(0);
-                
-                # report detailed event logs
-                $scraper->logger->verbose(0);
-                
-                # create a new log file with each execution
-                $scraper->logger->write("logs/$datetime.log")
-                    if $scraper->debug;
-                
-                # load session file for persistent storage between executions
-                -f '[% object FILTER lower %].sess' ?
-                    $scraper->session->load('[% object FILTER lower %].sess') :
-                    $scraper->session->write('[% object FILTER lower %].sess');
-                    
+            # project class
+            my  $self = shift;
+            
                 # define route(s) - route web pages to parsers
                 $self->route('/' => 'root');
                 
-                # return your configured app instance
-                $self;
+            # return your configured app instance
+            return $self;
         
         }
         

@@ -4,7 +4,7 @@
 package Scrappy::Scraper::Parser;
 
 BEGIN {
-    $Scrappy::Scraper::Parser::VERSION = '0.93111250';
+    $Scrappy::Scraper::Parser::VERSION = '0.94111260';
 }
 
 # load OO System
@@ -216,7 +216,7 @@ sub focus {
     my $self = shift;
     my $index = shift || 0;
 
-    $self->has_html;
+    return $self unless $self->has_html;
 
     $self->html($self->data->[$index]->{html});
     return $self;
@@ -227,7 +227,8 @@ sub scrape {
     my ($self, $selector, $html) = @_;
 
     $self->html($html) if $html;
-    $self->has_html;
+
+    return [] unless $self->has_html;
 
     $self->select($selector);
     return $self->data;
@@ -238,7 +239,8 @@ sub select {
     my ($self, $selector, $html) = @_;
 
     $self->html($html) if $html;
-    $self->has_html;
+
+    return $self unless $self->has_html;
 
     $self->worker->{code} = scraper {
         process($selector, "data[]", $self->html_tags);
@@ -254,8 +256,7 @@ sub select {
 
 sub has_html {
     my $self = shift;
-    croak("Can't parse HTML document without providing a valid source")
-      unless $self->html;
+    return $self->html ? 1 : 0;
 }
 
 1;
@@ -270,7 +271,7 @@ Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
 
 =head1 VERSION
 
-version 0.93111250
+version 0.94111260
 
 =head1 SYNOPSIS
 

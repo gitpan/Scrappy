@@ -1,7 +1,7 @@
 package Scrappy::Project::Document;
 
 BEGIN {
-    $Scrappy::Project::Document::VERSION = '0.93111250';
+    $Scrappy::Project::Document::VERSION = '0.94111260';
 }
 
 use Moose::Role;
@@ -49,7 +49,8 @@ sub parse {
 
     my $record = {};
     map { $record->{$_} = $self->$_($self->scraper, $vars) } @{$self->fields};
-    $record->{url} = $self->scraper->url->as_string;
+
+    # $record->{url} = $self->scraper->url->as_string;
     push @{$self->records}, $record;
 
     return $record;
