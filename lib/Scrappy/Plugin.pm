@@ -1,7 +1,7 @@
 package Scrappy::Plugin;
 
 BEGIN {
-    $Scrappy::Plugin::VERSION = '0.94111260';
+    $Scrappy::Plugin::VERSION = '0.94111280';
 }
 
 # load OO System

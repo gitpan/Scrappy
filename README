@@ -3,7 +3,7 @@ NAME
     Framework
 
 VERSION
-    version 0.94111260
+    version 0.94111280
 
 SYNOPSIS
         #!/usr/bin/perl
@@ -570,7 +570,7 @@ METHODS
         ->select('div div')->data;
         
     # The code above selects the div > div inside of the 5th tr in #container table
-        # Access tag html, text and other attributes as follows...
+        # Access attributes html, text and other attributes as follows...
         
     $element = $scraper->select('table')->data->[0];
         $element->{html}; # HTML representation of the table

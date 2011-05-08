@@ -1,7 +1,7 @@
 package Scrappy::Action::Download;
 
 BEGIN {
-    $Scrappy::Action::Download::VERSION = '0.94111260';
+    $Scrappy::Action::Download::VERSION = '0.94111280';
 }
 
 use URI;
@@ -15,7 +15,7 @@ sub page {
     my $url = $options[0];
     die "Can't download a page without a proper URL"
       unless $url;
-    $url = URI->new($url);
+    $url = URI->new($url)->as_string;
 
     my $scraper = Scrappy->new;
     $scraper->debug(1);
@@ -24,39 +24,45 @@ sub page {
     my $downloader = {
         '//link[@href]' => sub {
             my ($self, $item, $params) = @_;
+            my $link =
+              ref $item->{href} ? $item->{href}->as_string : $item->{href};
+            if ($link) {
+                if ($link =~ m{^$url} || $link !~ m/^http(s)?\:\/\//) {
 
-            if ($item->{href}) {
-                if (   $item->{href} =~ m{^$url}
-                    || $item->{href} !~ m/^http(s)?\:\/\//)
-                {
+                    $link = URI->new_abs($link, $url)->as_string
+                      if $link !~ m/^http(s)?\:\/\//;
 
-                    $item->{href} = URI->new_abs($item->{href}, $url)
-                      if $item->{href} !~ m/^http(s)?\:\/\//;
+                    $self->download($link);
 
-                    $self->download($item->{href});
+                   # assuming its a css stylesheet, lets see if we find
+                   # any images that need downloading
+                   # YES, ITS A HACK ... and a bad one, AHHHHHHHHHHHHHHH !!!!!!
 
-                    # assuming its a css stylesheet, lets see if we find
-                    # any images that need downloading
-                    # HACK AHHHHHHHHHHHHHHH !!!!!!!!!
-                    if ($self->get($item->{href})->page_loaded) {
+                    if ($self->get($link)->page_loaded) {
 
-                        if ($self->content) {
+                        if (   $self->worker->content_type =~ /css/
+                            || $self->worker->response->filename
+                            =~ /\.css(\?.*)?$/)
+                        {
 
-                            $self->content->decode;
-                            my @urls = $self->content->as_string
-                              =~ /url\s{0,}?\(?[\'\"\s]{0,}?([^\)]+)?[\'\"\s]{0,}?\)/g;
+                            if ($self->content) {
 
-                            if (@urls) {
+                                $self->content->decode;
+                                my @urls = $self->content->as_string
+                                  =~ /url\s{0,}?\(?[\'\"\s]{0,}?([^\)]+)?[\'\"\s]{0,}?\)/g;
 
-                                # download any found urls (probably images)
-                                foreach my $url (@urls) {
-                                    $url =~ s/^\s+//g;
-                                    $url =~ s/\s+$//g;
-                                    $url =~ s/[\'\"]//g;
-                                    $url !~ m/^http(s)?\:\/\//
-                                      ? $self->download(
-                                        URI->new_abs($url, $item->{href}))
-                                      : $self->download($url);
+                                if (@urls) {
+
+                                    # download any found urls (probably images)
+                                    foreach my $url (@urls) {
+                                        $url =~ s/^\s+//g;
+                                        $url =~ s/\s+$//g;
+                                        $url =~ s/[\'\"]//g;
+                                        $url !~ m/^http(s)?\:\/\//
+                                          ? $self->download(
+                                            URI->new_abs($url, $link))
+                                          : $self->download($url);
+                                    }
                                 }
                             }
                         }
@@ -66,26 +72,30 @@ sub page {
         },
         '//script[@src]' => sub {
             my ($self, $item, $params) = @_;
-            if ($item->{src}) {
+            my $script =
+              ref $item->{src} ? $item->{src}->as_string : $item->{src};
+            if ($script) {
 
-                $item->{src} = URI->new_abs($item->{src}, $url)
-                  if $item->{src} !~ m/^http(s)?\:\/\//;
+                $script = URI->new_abs($script, $url)->as_string
+                  if $script !~ m/^http(s)?\:\/\//;
 
-                $self->download($item->{src})
-                  if $item->{src} =~ m{^$url}
-                      || $item->{src} !~ m/^http(s)?\:\/\//;
+                $self->download($script)
+                  if $script =~ m{^$url}
+                      || $script !~ m/^http(s)?\:\/\//;
             }
         },
         '//img[@src]' => sub {
             my ($self, $item, $params) = @_;
-            if ($item->{src}) {
+            my $image =
+              ref $item->{src} ? $item->{src}->as_string : $item->{src};
+            if ($image) {
 
-                $item->{src} = URI->new_abs($item->{src}, $url)
-                  if $item->{src} !~ m/^http(s)?\:\/\//;
+                $image = URI->new_abs($image, $url)->as_string
+                  if $image !~ m/^http(s)?\:\/\//;
 
-                $self->download($item->{src})
-                  if $item->{src} =~ m{^$url}
-                      || $item->{src} !~ m/^http(s)?\:\/\//;
+                $self->download($image)
+                  if $image =~ m{^$url}
+                      || $image !~ m/^http(s)?\:\/\//;
             }
         },
     };

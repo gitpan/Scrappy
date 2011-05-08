@@ -4,7 +4,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 # VERSION
 
-version 0.94111260
+version 0.94111280
 
 # SYNOPSIS
 
@@ -661,7 +661,7 @@ The select method takes XPATH or CSS selectors and returns a
     
 
     # The code above selects the div > div inside of the 5th tr in #container table
-    # Access tag html, text and other attributes as follows...
+    # Access attributes html, text and other attributes as follows...
     
 
     $element = $scraper->select('table')->data->[0];

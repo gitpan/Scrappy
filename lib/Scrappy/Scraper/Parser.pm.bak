@@ -3,7 +3,7 @@
 
 package Scrappy::Scraper::Parser;
 BEGIN {
-  $Scrappy::Scraper::Parser::VERSION = '0.94111260';
+  $Scrappy::Scraper::Parser::VERSION = '0.94111280';
 }
 
 # load OO System
@@ -248,6 +248,27 @@ sub select {
 }
 
 
+sub first {
+    return shift->data->[0];
+}
+
+
+sub last {
+    my  $self = shift;
+    my  $index = @{$self->data} - 1;
+    return $self->data->[$index];
+}
+
+
+sub each {
+    my ($self, $code) = @_;
+    foreach my $item (@{$self->data}) {
+        $code->($item);
+    }
+    return $self;
+}
+
+
 sub has_html {
     my $self = shift;
     return $self->html ? 1 : 0;
@@ -264,7 +285,7 @@ Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
 
 =head1 VERSION
 
-version 0.94111260
+version 0.94111280
 
 =head1 SYNOPSIS
 
@@ -397,6 +418,42 @@ parser object. The data method can be used to access the extracted information.
         $parser->select('a', $from_html); #get all links
         
     my  $links = $parser->data;
+
+=head2 first
+
+The first method is used to return the first element from the extracted dataset.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('a', $from_html); #get all links
+        
+    my  $first_link = $parser->first;
+    
+    # equivalent to ...
+    my  $first_link = $parser->data->[0];
+
+=head2 last
+
+The last method is used to return the last element from the extracted dataset.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('a', $from_html); #get all links
+        
+    my  $last_link = $parser->last;
+    
+    # equivalent to ...
+    my  $last_link = $parser->data->[(@{$parser->data}-1)];
+
+=head2 each
+
+The each method is used loop through the extracted dataset. The each method
+takes one argument, a code reference, and is passed the each extracted item.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select('a', $from_html); #get all links
+        
+        $parser->each(sub{
+            print shift->{href} . "\n"
+        });
 
 =head2 has_html
 
