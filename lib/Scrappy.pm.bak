@@ -3,7 +3,7 @@
 
 package Scrappy;
 BEGIN {
-  $Scrappy::VERSION = '0.94111280';
+  $Scrappy::VERSION = '0.94111370';
 }
 
 # load OO System
@@ -93,7 +93,7 @@ Scrappy - The All Powerful Web Spidering, Scraping, Creeping Crawling Framework
 
 =head1 VERSION
 
-version 0.94111280
+version 0.94111370
 
 =head1 SYNOPSIS
 
@@ -115,19 +115,13 @@ And now manually, ... without crawl, the above is similar to the following ...
     #!/usr/bin/perl
     use Scrappy;
 
-    my $scraper = Scrappy->new;
-    my $q       = $scraper->queue;
-    
-    $q->add('http://search.cpan.org/recent'); # starting url
-    
-    while (my $url = $q->next) {
+    my  $scraper = Scrappy->new;
         
-        $scraper->get($url);
-        
-        foreach my $link (@{ $scraper->select('#cpansearch li a')->data }) {
-            $q->add($link->href);
+        if ($scraper->get($url)->page_loaded) {
+            $scraper->select('#cpansearch li a')->each(sub{
+                print shift->{href}, "\n";
+            });
         }
-    }
 
 =head1 DESCRIPTION
 

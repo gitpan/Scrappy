@@ -1,7 +1,7 @@
 package Scrappy::Action::Download;
 
 BEGIN {
-    $Scrappy::Action::Download::VERSION = '0.94111280';
+    $Scrappy::Action::Download::VERSION = '0.94111370';
 }
 
 use URI;
@@ -49,7 +49,7 @@ sub page {
 
                                 $self->content->decode;
                                 my @urls = $self->content->as_string
-                                  =~ /url\s{0,}?\(?[\'\"\s]{0,}?([^\)]+)?[\'\"\s]{0,}?\)/g;
+                                  =~ /url\s{0,}?\([\'\"\s]{0,}?([^\)]+)?[\'\"\s]{0,}?\)/g;
 
                                 if (@urls) {
 

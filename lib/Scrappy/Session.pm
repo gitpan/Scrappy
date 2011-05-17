@@ -4,7 +4,7 @@
 package Scrappy::Session;
 
 BEGIN {
-    $Scrappy::Session::VERSION = '0.94111280';
+    $Scrappy::Session::VERSION = '0.94111370';
 }
 
 # load OO System
@@ -104,7 +104,7 @@ Scrappy::Session - Scrappy Scraper Session Handling
 
 =head1 VERSION
 
-version 0.94111280
+version 0.94111370
 
 =head1 SYNOPSIS
 
