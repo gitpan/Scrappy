@@ -1,7 +1,7 @@
 package Scrappy::Scraper;
 
 BEGIN {
-    $Scrappy::Scraper::VERSION = '0.94111370';
+    $Scrappy::Scraper::VERSION = '0.94111610';
 }
 
 # load OO System
@@ -179,12 +179,6 @@ sub download {
 
     $url = URI->new(@_);
 
-    # access control
-    unless ($self->control->is_allowed($url)) {
-        $self->log("warn", "$url was not fetched, the url is prohibited");
-        return 0;
-    }
-
     # specify user-agent
     $self->worker->add_header("User-Agent" => $self->user_agent->name)
       if defined $self->user_agent->name;
@@ -192,7 +186,7 @@ sub download {
     # set html response
     if ($url && $dir && $file) {
         $dir =~ s/[\\\/]+$//;
-        $self->get($url);
+        return unless $self->get($url);
         $self->store(join '/', $dir, $file);
         $self->log("info",
                 "$url was downloaded to "
@@ -202,7 +196,7 @@ sub download {
     }
     elsif ($url && $dir) {
         $dir =~ s/[\\\/]+$//;
-        $self->get($url);
+        return unless $self->get($url);
         my @chars = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
         my $filename = $self->worker->response->filename;
         $filename =
@@ -222,7 +216,7 @@ sub download {
         $self->back;
     }
     elsif ($url) {
-        $self->get($url);
+        return unless $self->get($url);
         my @chars = ('a' .. 'z', 'A' .. 'Z', 0 .. 9);
         my $filename = $self->worker->response->filename;
         $filename =
@@ -274,12 +268,6 @@ sub form {
 
     # TODO: need to figure out how to determine the form action before submit
 
-    # access control
-    #unless ($self->control->is_allowed($url)) {
-    #    $self->log("warn", "$url was not fetched, the url is prohibited");
-    #    return 0;
-    #}
-
     # specify user-agent
     $self->worker->add_header("User-Agent" => $self->user_agent->name)
       if defined $self->user_agent->name;
@@ -289,9 +277,20 @@ sub form {
     try {
         $self->content($self->worker->submit_form(@_));
     };
-    $self->content
-      ? $self->log("info",  "form posted from $url successfully", @_)
-      : $self->log("error", "error POSTing form from $url",       @_);
+    if ($self->content) {
+
+        # access control
+        if ($self->control->is_allowed($self->content)) {
+            $self->log("warn", "$url was not fetched, the url is prohibited");
+            return 0;
+        }
+        else {
+            $self->log("info", "form posted from $url successfully", @_);
+        }
+    }
+    else {
+        $self->log("error", "error POSTing form from $url", @_);
+    }
 
     #$self->stash->{history} = [] unless defined $self->stash->{history};
     #push @{$self->stash->{history}}, $url;
@@ -339,12 +338,6 @@ sub get {
     my $self = shift;
     my $url  = URI->new(@_);
 
-    # access control
-    unless ($self->control->is_allowed($url)) {
-        $self->log("warn", "$url was not fetched, the url is prohibited");
-        return 0;
-    }
-
     # specify user-agent
     $self->worker->add_header("User-Agent" => $self->user_agent->name)
       if defined $self->user_agent->name;
@@ -354,9 +347,20 @@ sub get {
     try {
         $self->content($self->worker->get($url));
     };
-    $self->content
-      ? $self->log("info",  "$url was fetched successfully")
-      : $self->log("error", "error GETing $url");
+    if ($self->content) {
+
+        # access control
+        if (!$self->control->is_allowed($self->content)) {
+            $self->log("warn", "$url was not fetched, the url is prohibited");
+            return 0;
+        }
+        else {
+            $self->log("info", "$url was fetched successfully");
+        }
+    }
+    else {
+        $self->log("error", "error GETing $url");
+    }
 
     $self->stash->{history} = [] unless defined $self->stash->{history};
     push @{$self->stash->{history}}, $url;
@@ -388,7 +392,7 @@ sub get {
             $self->session->write;
 
         }
-    );
+    ) if $self->session->file;
 
     $self->worker->{params} = {};
     $self->worker->{params} =
@@ -628,9 +632,20 @@ sub post {
     try {
         $self->content($self->worker->post(@_));
     };
-    $self->content
-      ? $self->log("info",  "posted data to $_[0] successfully", @_)
-      : $self->log("error", "error POSTing data to $_[0]",       @_);
+    if ($self->content) {
+
+        # access control
+        if ($self->control->is_allowed($self->content)) {
+            $self->log("warn", "$url was not fetched, the url is prohibited");
+            return 0;
+        }
+        else {
+            $self->log("info", "posted data to $_[0] successfully", @_);
+        }
+    }
+    else {
+        $self->log("error", "error POSTing data to $_[0]", @_);
+    }
 
     $self->stash->{history} = [] unless defined $self->stash->{history};
     push @{$self->stash->{history}}, $url;
@@ -811,7 +826,8 @@ sub store {
 }
 
 sub url {
-    return shift->worker->uri;
+    return $_[0]->worker->uri
+      if $_[0]->content;
 }
 
 1;
