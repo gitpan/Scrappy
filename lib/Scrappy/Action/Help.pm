@@ -1,7 +1,7 @@
 package Scrappy::Action::Help;
 
 BEGIN {
-    $Scrappy::Action::Help::VERSION = '0.94111610';
+    $Scrappy::Action::Help::VERSION = '0.94112070';
 }
 
 use Moose::Role;

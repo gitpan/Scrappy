@@ -1,7 +1,7 @@
 package Scrappy::Scraper;
 
 BEGIN {
-    $Scrappy::Scraper::VERSION = '0.94111610';
+    $Scrappy::Scraper::VERSION = '0.94112070';
 }
 
 # load OO System
@@ -274,8 +274,9 @@ sub form {
 
     # set html response
     $self->content('');
+    my @args = @_;
     try {
-        $self->content($self->worker->submit_form(@_));
+        $self->content($self->worker->submit_form(@args));
     };
     if ($self->content) {
 
@@ -629,8 +630,9 @@ sub post {
 
     # set html response
     $self->content('');
+    my @args = @_;
     try {
-        $self->content($self->worker->post(@_));
+        $self->content($self->worker->post(@args));
     };
     if ($self->content) {
 
