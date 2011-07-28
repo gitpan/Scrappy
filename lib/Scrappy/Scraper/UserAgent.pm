@@ -1,7 +1,7 @@
 package Scrappy::Scraper::UserAgent;
 
 BEGIN {
-    $Scrappy::Scraper::UserAgent::VERSION = '0.94112070';
+    $Scrappy::Scraper::UserAgent::VERSION = '0.94112090';
 }
 
 # load OO System

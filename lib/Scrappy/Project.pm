@@ -1,7 +1,7 @@
 package Scrappy::Project;
 
 BEGIN {
-    $Scrappy::Project::VERSION = '0.94112070';
+    $Scrappy::Project::VERSION = '0.94112090';
 }
 
 use Carp;

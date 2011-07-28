@@ -4,7 +4,7 @@
 package Scrappy::Scraper::Parser;
 
 BEGIN {
-    $Scrappy::Scraper::Parser::VERSION = '0.94112070';
+    $Scrappy::Scraper::Parser::VERSION = '0.94112090';
 }
 
 # load OO System
@@ -266,6 +266,23 @@ sub last {
 }
 
 
+sub select_first {
+    my ($self, $selector, $attribute) = @_;
+    $self->select($selector);
+    return $self->data->[0] ? $self->data->[0]->{$attribute || 'text'} : '';
+}
+
+
+sub select_last {
+    my ($self, $selector, $attribute) = @_;
+    $self->select($selector);
+    my $index = @{$self->data} - 1;
+    return $self->data->[$index]
+      ? $self->data->[$index]->{$attribute || 'text'}
+      : '';
+}
+
+
 sub each {
     my ($self, $code) = @_;
     foreach my $item (@{$self->data}) {
@@ -292,7 +309,7 @@ Scrappy::Scraper::Parser - Scrappy Scraper Data Extrator
 
 =head1 VERSION
 
-version 0.94112070
+version 0.94112090
 
 =head1 SYNOPSIS
 
@@ -449,6 +466,24 @@ The last method is used to return the last element from the extracted dataset.
     
     # equivalent to ...
     my  $last_link = $parser->data->[(@{$parser->data}-1)];
+
+=head2 select_first
+
+The select_first method is a convenience feature combining the select() and first()
+methods to return the first element from the extracted data.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select_first('a'); #get link text
+        $parser->select_first('a', 'href'); #get link URL
+
+=head2 select_last
+
+The select_last method is a convenience feature combining the select() and last()
+methods to return the last element from the extracted data.
+
+    my  $parser = Scrappy::Scraper::Parser->new;
+        $parser->select_last('a'); #get link text
+        $parser->select_last('a', 'href'); #get link URL
 
 =head2 each
 
